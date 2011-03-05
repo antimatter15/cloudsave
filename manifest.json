@@ -1,6 +1,6 @@
 {
   "name": "Cloud Save",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "Save to cloud.",
 	"background_page": "cloudsave.html",
   "permissions": [

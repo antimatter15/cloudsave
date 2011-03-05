@@ -2,13 +2,13 @@
   do not venture below, i hate this.
   wont bother seeing if https works
 */
-var PicasaOAUTH = ChromeExOAuth.initBackgroundPage({
+var GoogleOAUTH = ChromeExOAuth.initBackgroundPage({
   'request_url' : 'https://www.google.com/accounts/OAuthGetRequestToken',
   'authorize_url' : 'https://www.google.com/accounts/OAuthAuthorizeToken',
   'access_url' : 'https://www.google.com/accounts/OAuthGetAccessToken',
   'consumer_key' : 'anonymous',
   'consumer_secret' : 'anonymous',
-  'scope' : 'http://picasaweb.google.com/data/',
+  'scope' : 'https://docs.google.com/feeds/ https://picasaweb.google.com/data/',
   'app_name' : 'cloudsave'
 });
 
@@ -42,8 +42,8 @@ Hosts.picasa = function uploadPicasa(req, callback){
   
   function createAlbum(){
       console.log('creating drag2up album')
-      PicasaOAUTH.sendSignedRequest(
-        'http://picasaweb.google.com/data/feed/api/user/default',
+      GoogleOAUTH.sendSignedRequest(
+        'https://picasaweb.google.com/data/feed/api/user/default',
         function(resp){
           var j = JSON.parse(resp);
           uploadImage(j.entry.gphoto$id.$t);
@@ -71,7 +71,7 @@ xmlns:media='http://search.yahoo.com/mrss/'\
   
   function uploadImage(albumId){
       console.log('uploading image');
-      PicasaOAUTH.sendSignedRequest(
+      GoogleOAUTH.sendSignedRequest(
         'http://picasaweb.google.com/data/feed/api/' +
         'user/default/albumid/'+albumId,
         complete,
@@ -93,11 +93,11 @@ xmlns:media='http://search.yahoo.com/mrss/'\
   
   
 
-    PicasaOAUTH.authorize(function() {
+    GoogleOAUTH.authorize(function() {
       console.log("yay authorized");
       
-       PicasaOAUTH.sendSignedRequest(
-        'http://picasaweb.google.com/data/feed/api/user/default',
+       GoogleOAUTH.sendSignedRequest(
+        'https://picasaweb.google.com/data/feed/api/user/default',
         function(resp, xhr) {
           if (!(xhr.status >= 200 && xhr.status <= 299)) {
             alert('Error: Response status = ' + xhr.status +
