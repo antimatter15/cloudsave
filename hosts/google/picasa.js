@@ -72,7 +72,7 @@ xmlns:media='http://search.yahoo.com/mrss/'\
   function uploadImage(albumId){
       console.log('uploading image');
       GoogleOAUTH.sendSignedRequest(
-        'http://picasaweb.google.com/data/feed/api/' +
+        'https://picasaweb.google.com/data/feed/api/' +
         'user/default/albumid/'+albumId,
         complete,
         {
