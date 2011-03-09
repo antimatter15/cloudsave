@@ -37,7 +37,9 @@ var hosts = {
 function contextClick2(info, tab){
   var url = info.linkUrl || info.srcUrl;
   var name = prompt("What would you like to save the file as?",unescape(unescape(unescape(url))).replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,''));
-  upload(menus[info.menuItemId], url, name);
+  if(name){
+    upload(menus[info.menuItemId], url, name);
+  }
 }
 
 
