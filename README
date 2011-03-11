@@ -1,4 +1,4 @@
-Cloud Save
+############# Cloud Save
 
 It's actually really amazing how many people now use Cloud Save. In fact, when I
 first built this, I had no idea how anyone would possibly find this extension of
@@ -12,3 +12,82 @@ probably the one project of mine which actually has a fairly decent name.
 
 Right now, I'm going to try doing development of cloud save on the cloud via the 
 cloud9 IDE on a Cr-48. It's going pretty well so far and it's really awesome.
+
+############## Design for Cloud Save 1.2
+
+Version 1.2 will feature tons and tons of magic. Really really magical magic. 
+
+The basis is a moving window-ish persistant stack which contains the names of hosts
+used. eg. dropbox, dropbox, picasa, picasa, box.net, google docs, dropbox, google docs, dropbox
+
+Right now, I figure the ideal value is 10. Why? Because Math.sqrt(10) day is next 
+week and also incidentally my birthday is on sqrt(10) day. It's also between five 
+and fifteen, if my third grade arithmetic skills are still intact. 
+
+So this moving window is kept persistantly via localStorage. It gets processed and 
+sorted into unique elements: dropbox, picasa, google docs, box.net. Then those are
+sorted by a magical ranking coefficient.
+
+The general formula for this ranking index is
+number_of_times_used_in_past_10 + most_recent_index / index_dampening_factor
+
+dropbox was used 4 times in that list - most recent is the last one of the list of so index 8
+picasa twice - most recent index is 3
+box.net once - most recent index is 4
+google docs twice - most recent index is 7
+
+the index dampening factor should be a big number. the second term in the magical
+equation that is used here exists for the sole purpose of breaking ties between
+things used an equal number of times to favor those who have been used more recently
+(or should it be a smaller number?). A good value is something like the total 
+size of the moving window multiplied by 10. But to be safe, something like 1000 could
+be used. Though any number should theoretically work, for debugging purposes it would
+be nice if it was a power of ten.
+
+The top six most recently used hosts will be shown. Or less than that if the last
+ten include less than six items (again, ordered by the rank thing).
+
+Once a file is uploaded, the list must be recalculated and generated.
+
+The first level menu will be the same: 
+
+Cloud Save >
+
+Second level:
+
+Save As... >
+------------
+HOst1
+Host2
+Host3
+Host5
+Host6
+Host4
+------------
+More       >
+
+There are two tertiary menus. Save As... however looks exactly like the secondary
+level menu but without another save as submenu (obviously).
+
+So the More.. menu, which is the only interesting tertiary menu will be as follows:
+
+Add/Remove...
+-------------
+HostA
+HostB
+HostC
+HostD
+HostE
+HostF
+HostG
+HostH
+...
+
+As follows. The tertiary list will include all the other hosts in alphabetical order.
+
+Add/Remove is sort of a misnomer as it will not actually do anything in verison 1.2
+instead, it'll be a link to the settings page which will do virtually nothing except
+for configuring some very magical variable coefficients and stuff. probably.
+
+These plans were written at 4:23PM Eastern Standard Time on the Eleventh of March of
+the year 2011.
