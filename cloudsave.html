@@ -59,7 +59,7 @@ function upload(host, url, name){
     name: name
   }, function(e){
     console.log('uploaded file yay', e);
-    if(e && e.indexOf('error:') != -1){
+    if(e && typeof e == "string" && e.indexOf('error:') != -1){
       var notification = webkitNotifications.createNotification(
         'icon/64sad.png',  // icon url - can be relative
         "Aww Snap!",  // notification title
