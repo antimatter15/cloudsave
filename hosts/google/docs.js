@@ -5,7 +5,7 @@ Hosts.gdocs = function uploadGDocs(req, callback){
     var bin = file.data;
     var arr = new Uint8Array(bin.length);
     for(var i = 0, l = bin.length; i < l; i++){
-      arr[i] = bin.charCodeAt(i)
+      arr[i] = bin.charCodeAt(i);
     }
     builder.append(arr.buffer);
     
@@ -17,7 +17,11 @@ Hosts.gdocs = function uploadGDocs(req, callback){
       console.log(resp, xhr);
       callback();
     }catch(err){
-      callback('error:'+resp.replace(/<.*?>/g,' ').replace(/ +/g,' '))
+      if(resp.indexOf("ServiceForbiddenException") != -1){
+        callback('error: Google Docs API only supports Document, Presentation and Spreadsheet files.');
+      }else{
+        callback('error:'+resp.replace(/<.*?>/g,' ').replace(/ +/g,' '));
+      }
     }
   }
   
