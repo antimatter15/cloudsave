@@ -106,6 +106,10 @@ function updateMenus(){
   var sorted = unique.sort(function(a,b){
     return grade(b) - grade(a);
   });
+  console.log(recent);
+  console.log(unique.map(function(a){
+    return a + ' ' + grade(a)  
+  }))
   for(var i = 0; i < sorted.length; i++){
     var prop = {
       "title": title_map[sorted[i]],
