@@ -24,14 +24,17 @@ var classes = {
     picasa: 'Picasa',
     twitpic: 'TwitPic',
     flickr: 'Flickr',
-    posterous: 'Posterous'//,
-    //twitrpix: 'Twitrpix'
+    posterous: 'Posterous',
+    twitrpix: 'Twitrpix',
+    twitgoo: 'Twitgoo',
+    imgly: 'Imgly'
   },
   "all": {
     box: 'Box.net',
     dropbox: 'Dropbox',
     gdocs: 'Google Docs',
-    minus: 'Min.us'
+    minus: 'Min.us',
+    droplr: 'Droplr'
   }
 };
 
