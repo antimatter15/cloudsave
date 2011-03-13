@@ -1,10 +1,7 @@
 var Hosts = {};
 
 /*
-var url = info.linkUrl || info.srcUrl || info.pageUrl;
-unescape(unescape(unescape(url)))
-  .replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,'') || 
-url.replace(/^.*:|\..*|[^\w]/g,'')
+
 */
 //chrome.contextMenus.removeAll();
 
@@ -70,6 +67,21 @@ var recent = [
   'dropbox'
 ];
 
+
+function handle_click(info, tab){
+  console.log(arguments);
+  var url = info.linkUrl || info.srcUrl || info.pageUrl;
+  var name = unescape(unescape(unescape(url)))
+            .replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,'') || 
+            url.replace(/^.*:|\..*|[^\w]/g,'');
+  if(info.parentMenuItemId == save_as){
+    //woot save as stuff
+    console.log('save as');
+  };
+  var host = menu_ids[info.menuItemId];
+  console.log(host, url, name);
+}
+
 function updateMenus(){
   Object.keys(menu_ids).reverse().forEach(function(item){
     chrome.contextMenus.remove(parseInt(item));
@@ -92,6 +104,7 @@ function updateMenus(){
   for(var i = 0; i < sorted.length; i++){
     var prop = {
       "title": title_map[sorted[i]],
+      "onclick": handle_click,
       "contexts": classes.image[sorted[i]] ? 
                   ['image'] : ['page', 'link', 'image']
     };
@@ -128,6 +141,7 @@ function updateMenus(){
   for(var i = 0; i < others.length; i++){
     var prop = {
       "title": title_map[others[i]],
+      "onclick": handle_click,
       "contexts": classes.image[others[i]] ? 
                   ['image'] : ['page', 'link', 'image']
     };
