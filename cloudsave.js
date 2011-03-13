@@ -43,6 +43,12 @@ var classes = {
   }
 };
 
+
+function clone(obj){ //very shallow cloning
+  var n = {};
+  for(var i in obj) n[i] = obj[i]; //we are the knights who say ni!
+  return n;
+}
 var title_map = {};
 
 for(var i in classes){
@@ -90,9 +96,9 @@ function updateMenus(){
                   ['image'] : ['page', 'link', 'image']
     };
     prop.parentId = root;
-    menu_ids[chrome.contextMenus.create(prop)] = sorted[i];
+    menu_ids[chrome.contextMenus.create(clone(prop))] = sorted[i];
     prop.parentId = save_as;
-    menu_ids[chrome.contextMenus.create(prop)] = sorted[i];
+    menu_ids[chrome.contextMenus.create(clone(prop))] = sorted[i];
   }
   var others = Object.keys(title_map).sort().filter(function(x){
     return unique.indexOf(x) == -1;
@@ -116,9 +122,9 @@ function updateMenus(){
                   ['image'] : ['page', 'link', 'image']
     };
     prop.parentId = root_more;
-    menu_ids[chrome.contextMenus.create(prop)] = others[i];
+    menu_ids[chrome.contextMenus.create(clone(prop))] = others[i];
     prop.parentId = save_as_more;
-    menu_ids[chrome.contextMenus.create(prop)] = others[i];
+    menu_ids[chrome.contextMenus.create(clone(prop))] = others[i];
   }
   menu_ids[chrome.contextMenus.create({
     "title": "Add/Remove",
