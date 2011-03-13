@@ -16,8 +16,10 @@ Hosts.dropbox = function uploadDropbox(req, callback){
         dropbox.getDirectoryMetadata(folder + encodeURIComponent(file.name), function(json){
           if(json.error && json.error.indexOf('not found') != -1){
             //yay plop it on the top
-          }else{
+          }else if(fname.indexOf('/') == -1){
             fname = Math.random().toString(36).substr(2,4) + '_' + fname;
+          }else{
+            //no idea. TODO: do something
           }
           
           

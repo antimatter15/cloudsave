@@ -1,10 +1,5 @@
 var Hosts = {};
 
-/*
-
-*/
-//chrome.contextMenus.removeAll();
-
 var root = chrome.contextMenus.create({
   "title" : "Cloud Save",
   "contexts" : ["page", "image", "link"]
@@ -56,16 +51,29 @@ for(var i in classes){
 
 var menu_ids = {};
 
+//an order which shoudl theoretically work, but isnt optimal
+//in any stretch of the imagination
+/*
+  general idea: 
+    1. quantity (2 > 1)
+    2. position (end > beginning)
+*/
 
-var recent = [
-  'twitpic',
-  'dropbox',
-  'flickr',
-  'box',
-  'picasa',
-  'gdocs',
-  'dropbox'
-];
+
+try {
+  recent = JSON.parse(localStorage.cloudsave_recent);
+}catch(err){
+  recent = [
+    'gdocs',
+    'twitpic',
+    'dropbox',
+    'flickr',
+    'box',
+    'picasa',
+    'gdocs',
+    'dropbox'
+  ];
+}
 
 
 function handle_click(info, tab){
@@ -76,15 +84,28 @@ function handle_click(info, tab){
             url.replace(/.*\/\/|www./g,'')
                .replace(/[^\w]+/g,'_')
                .replace(/^_*|_*$/g,'');
+  var host = menu_ids[info.menuItemId];
+  
+  if(host == 'dropbox' && localStorage.folder_prefix){
+    name = localStorage.folder_prefix + name;
+  }
   if(info.parentMenuItemId == save_as){
     //woot save as stuff
     console.log('save as');
+    name = prompt('Save file as...', name);
+    if(!name) return;
   };
-  var host = menu_ids[info.menuItemId];
+  
+  if(name.indexOf('/') != -1){
+    localStorage.folder_prefix = name.replace(/[^\/]+$/,'');
+  }
   console.log(host, url, name);
   recent.push(host);
   recent.shift();
+  localStorage.cloudsave_recent = JSON.stringify(recent);
   updateMenus();
+  
+  upload(host, url, name);
 }
 
 function updateMenus(){
@@ -125,6 +146,7 @@ function updateMenus(){
   var others = Object.keys(title_map).sort().filter(function(x){
     return unique.indexOf(x) == -1;
   });
+  /*
   menu_ids[chrome.contextMenus.create({
     "type": "separator",
     "contexts": ["all"],
@@ -135,6 +157,7 @@ function updateMenus(){
     "contexts": ["all"],
     "parentId": save_as
   })] = 42;
+  //*/
   var save_as_more = chrome.contextMenus.create({
     "title": "More",
     "parentId": save_as,
@@ -170,63 +193,6 @@ function updateMenus(){
 updateMenus();
 
 
-/*
-
-var root = chrome.contextMenus.create({
-  "title" : "Cloud Save",
-  "type" : "normal",
-  "contexts" : ["page", "image", "link"]
-});
-
-var asroot = chrome.contextMenus.create({
-  "title" : "Save As...",
-  "type" : "normal",
-  "parentId": root,
-  "contexts" : ["page", "image", "link"]
-});
-
-chrome.contextMenus.create({
-  "type" : "separator",
-  "contexts": [["all"]],
-  "parentId": root
-});
-
-
-var Hosts = {};
-
-
-
-var hosts = {
-  "gdocs": ["Google Docs", "link", "page"],
-  "dropbox": ["Dropbox", "link", "image", "page"],
-  "cloudapp": ["CloudApp", "link", "image", "page"],
-  "box": ["Box.net", "link", "image", "page"],
-  "minus": ["Min.us", "link", "image", "page"],
-  "droplr": ["Droplr", "link", "image", "page"],
-  "picasa": ["Picasa", "image"],
-  "flickr": ["Flickr", "image"],
-  "posterous": ["Posterous", "image"],
-  "twitpic": ["Twitpic", "image"]
-}, menus = {};
-
-function contextClick2(info, tab){
-  var url = info.linkUrl || info.srcUrl;
-  var name = prompt("What would you like to save the file as?",
-  unescape(unescape(unescape(url)))
-  .replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,''));
-  if(name){
-    upload(menus[info.menuItemId], url, name);
-  }
-}
-
-
-function contextClick(info, tab){
-  var url = info.linkUrl || info.srcUrl;
-  var name = unescape(unescape(unescape(url)))
-  .replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,'');
-  upload(menus[info.menuItemId], url, name);
-}
-
 
 function upload(host, url, name){
   Hosts[host]({
@@ -239,7 +205,7 @@ function upload(host, url, name){
         'icon/64sad.png',  // icon url - can be relative
         "Aww Snap!",  // notification title
         "The file '"+name+"' could not be uploaded to "+
-        hosts[host][0]+". "+e.substr(6)  // notification body text
+        title_map[host]+". "+e.substr(6)  // notification body text
       );
       notification.show();
     }else{
@@ -247,47 +213,10 @@ function upload(host, url, name){
         'icon/64.png',  // icon url - can be relative
         "Uploading Complete",  // notification title
         "The file '"+name+"' has been uploaded to "+
-        hosts[host][0]+"."  // notification body text
+        title_map[host]+"."  // notification body text
       );
       notification.show();
     }
   })
 }
-
-for(var i in hosts){
-  menus[chrome.contextMenus.create({
-    title: hosts[i][0],
-    type: "normal",
-    contexts: hosts[i].slice(1),
-    parentId: root,
-    onclick: contextClick
-  })] = i;
-  
-  menus[chrome.contextMenus.create({
-    title: hosts[i][0],
-    type: "normal",
-    contexts: hosts[i].slice(1),
-    parentId: asroot,
-    onclick: contextClick2
-  })] = i;
-}
-
-
-chrome.contextMenus.create({
-  "type" : "separator",
-	"contexts": [["all"]],
-  "parentId": root
-});
-chrome.contextMenus.create({
-  "title" : "Add/Remove",
-  "type" : "normal",
-  "parentId": root,
-	"onclick": function(){
-		chrome.tabs.create({
-			url: "settings.html"
-		})
-	},
-  "contexts" : [["all"]]
-});
-*/
 

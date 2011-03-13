@@ -41,7 +41,7 @@ Hosts.picasa = function uploadPicasa(req, callback){
   
   
   function createAlbum(){
-      console.log('creating drag2up album')
+      console.log('creating cloudsave album')
       GoogleOAUTH.sendSignedRequest(
         'https://picasaweb.google.com/data/feed/api/user/default',
         function(resp){
@@ -59,9 +59,8 @@ Hosts.picasa = function uploadPicasa(req, callback){
           body: "<entry xmlns='http://www.w3.org/2005/Atom' \
 xmlns:media='http://search.yahoo.com/mrss/'\
     xmlns:gphoto='http://schemas.google.com/photos/2007'>\
-  <title type='text'>drag2up</title>\
-  <summary type='text'>Files uploaded with drag2up.</summary>\
-  <gphoto:access>public</gphoto:access>\
+  <title type='text'>cloudsave</title>\
+  <summary type='text'>Files uploaded with cloudsave.</summary>\
   <category scheme='http://schemas.google.com/g/2005#kind'\
     term='http://schemas.google.com/photos/2007#album'></category>\
 </entry>"
@@ -108,9 +107,9 @@ xmlns:media='http://search.yahoo.com/mrss/'\
           var albumId;
           for(var index = 0; index < jsonData.feed.entry.length; index++){
             var entryData = jsonData.feed.entry[index];
-            if(/drag2up/.test(entryData.title['$t'])){
+            if(/cloudsave/.test(entryData.title['$t'])){
               albumId = entryData['gphoto$id']['$t']
-              console.log('found a drag2up album');
+              console.log('found a cloudsave album');
             }
           }
           if(albumId){
