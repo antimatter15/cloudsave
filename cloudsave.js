@@ -74,6 +74,7 @@ var recent = [
 function updateMenus(){
   for(var i in menu_ids){
     chrome.contextMenus.remove(parseInt(i));
+    delete menu_ids[i];
   }
   for(var unique = [], freqmap = {}, i = 0; i < recent.length;i++){
     if(!freqmap[recent[i]]){
@@ -136,11 +137,12 @@ function updateMenus(){
     prop.parentId = save_as_more;
     menu_ids[chrome.contextMenus.create(clone(prop))] = others[i];
   }
+  /*
   menu_ids[chrome.contextMenus.create({
     "title": "Add/Remove",
     "contexts": ["all"],
     "parentId": root
-  })] = 'add_remove';
+  })] = 'add_remove';*/
 }
 
 updateMenus();
