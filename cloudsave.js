@@ -72,10 +72,10 @@ var recent = [
 ];
 
 function updateMenus(){
-  for(var i in menu_ids){
-    chrome.contextMenus.remove(parseInt(i));
-    delete menu_ids[i];
-  }
+  Object.keys(menu_ids).reverse().forEach(function(item){
+    chrome.contextMenus.remove(parseInt(item));
+  });
+  menu_ids = {};
   for(var unique = [], freqmap = {}, i = 0; i < recent.length;i++){
     if(!freqmap[recent[i]]){
       freqmap[recent[i]] = 1;
