@@ -103,6 +103,16 @@ function updateMenus(){
   var others = Object.keys(title_map).sort().filter(function(x){
     return unique.indexOf(x) == -1;
   });
+  menu_ids[chrome.contextMenus.create({
+    "type": "separator",
+    "contexts": ["all"],
+    "parentId": root
+  })] = 42;
+  menu_ids[chrome.contextMenus.create({
+    "type": "separator",
+    "contexts": ["all"],
+    "parentId": save_as
+  })] = 42;
   var save_as_more = chrome.contextMenus.create({
     "title": "More",
     "parentId": save_as,
