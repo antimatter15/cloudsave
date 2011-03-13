@@ -63,7 +63,7 @@ var menu_ids = {};
 var recent = [
   'twitpic',
   'dropbox',
-  'min.us',
+  'minus',
   'flickr',
   'box',
   'picasa',
