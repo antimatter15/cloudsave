@@ -15,13 +15,13 @@ var root = chrome.contextMenus.create({
 
 var save_as = chrome.contextMenus.create({
   "title": "Save As...",
-  "contexts": "all",
+  "contexts": ["all"],
   "parentId": root
 });
 
 chrome.contextMenus.create({
   "type": "separator",
-  "contexts": "all",
+  "contexts": ["all"],
   "parentId": root
 });
 
@@ -100,13 +100,13 @@ function updateMenus(){
   var save_as_more = chrome.contextMenus.create({
     "title": "More",
     "parentId": save_as,
-    "contexts": "all"
+    "contexts": ["all"]
   });
   menu_ids[save_as_more] = 'save_as_more';
   var root_more = chrome.contextMenus.create({
     "title": "More",
     "parentId": root,
-    "contexts": "all"
+    "contexts": ["all"]
   });
   menu_ids[root_more] = 'root_more';
   for(var i = 0; i < others.length; i++){
@@ -122,17 +122,12 @@ function updateMenus(){
   }
   menu_ids[chrome.contextMenus.create({
     "title": "Add/Remove",
-    "contexts": "all",
+    "contexts": ["all"],
     "parentId": root
   })] = 'add_remove';
 }
 
-
-
 updateMenus();
-
-
-
 
 
 /*
@@ -152,7 +147,7 @@ var asroot = chrome.contextMenus.create({
 
 chrome.contextMenus.create({
   "type" : "separator",
-  "contexts": ["all"],
+  "contexts": [["all"]],
   "parentId": root
 });
 
@@ -240,7 +235,7 @@ for(var i in hosts){
 
 chrome.contextMenus.create({
   "type" : "separator",
-	"contexts": ["all"],
+	"contexts": [["all"]],
   "parentId": root
 });
 chrome.contextMenus.create({
@@ -252,7 +247,7 @@ chrome.contextMenus.create({
 			url: "settings.html"
 		})
 	},
-  "contexts" : ["all"]
+  "contexts" : [["all"]]
 });
 */
 
