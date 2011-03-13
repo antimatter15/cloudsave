@@ -63,7 +63,6 @@ var menu_ids = {};
 var recent = [
   'twitpic',
   'dropbox',
-  'minus',
   'flickr',
   'box',
   'picasa',
@@ -129,7 +128,7 @@ function updateMenus(){
   for(var i = 0; i < others.length; i++){
     var prop = {
       "title": title_map[others[i]],
-      "contexts": classes.image[sorted[i]] ? 
+      "contexts": classes.image[others[i]] ? 
                   ['image'] : ['page', 'link', 'image']
     };
     prop.parentId = root_more;
