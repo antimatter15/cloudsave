@@ -72,14 +72,19 @@ function handle_click(info, tab){
   console.log(arguments);
   var url = info.linkUrl || info.srcUrl || info.pageUrl;
   var name = unescape(unescape(unescape(url)))
-            .replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,'') || 
-            url.replace(/^.*:|\..*|[^\w]/g,'');
+              .replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,'') || 
+            url.replace(/.*\/\/|www./g,'')
+               .replace(/[^\w]+/g,'_')
+               .replace(/^_*|_*$/g,'');
   if(info.parentMenuItemId == save_as){
     //woot save as stuff
     console.log('save as');
   };
   var host = menu_ids[info.menuItemId];
   console.log(host, url, name);
+  recent.push(host);
+  recent.shift();
+  updateMenus();
 }
 
 function updateMenus(){
