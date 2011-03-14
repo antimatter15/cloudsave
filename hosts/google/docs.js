@@ -32,6 +32,7 @@ Hosts.gdocs = function uploadGDocs(req, callback){
       
       if(file.name.indexOf('.doc') != -1) file.type = 'application/msword';
       if(file.name.indexOf('.xls') != -1) file.type = 'application/vnd.ms-excel';
+      if(file.name.indexOf('.ppt') != -1) file.type = 'application/vnd.ms-powerpoint';
       
       GoogleOAUTH.sendSignedRequest(
         'https://docs.google.com/feeds/default/private/full',

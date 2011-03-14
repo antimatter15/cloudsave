@@ -34,6 +34,7 @@ var classes = {
     dropbox: 'Dropbox',
     gdocs: 'Google Docs',
     minus: 'Min.us',
+    cloudapp: 'CloudApp',
     droplr: 'Droplr'
   }
 };
