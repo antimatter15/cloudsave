@@ -18,7 +18,7 @@ Hosts.gdocs = function uploadGDocs(req, callback){
       callback();
     }catch(err){
       if(resp.indexOf("ServiceForbiddenException") != -1){
-        callback('error: Google Docs API only supports Document, Presentation and Spreadsheet files.');
+        callback('error: Google Docs API only supports ppt, docx, doc, xlsx, xls, jpeg, html, png, rtf, csv, odf, odt, ods, and odt.');
       }else{
         callback('error:'+resp.replace(/<.*?>/g,' ').replace(/ +/g,' '));
       }
@@ -33,6 +33,14 @@ Hosts.gdocs = function uploadGDocs(req, callback){
       if(file.name.indexOf('.doc') != -1) file.type = 'application/msword';
       if(file.name.indexOf('.xls') != -1) file.type = 'application/vnd.ms-excel';
       if(file.name.indexOf('.ppt') != -1) file.type = 'application/vnd.ms-powerpoint';
+      
+
+      if(file.name.indexOf('.xlsx') != -1) file.type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      if(file.name.indexOf('.docx') != -1) file.type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      
+      file.type = file.type.replace(/;.+/g,'');
+      
+      console.log('uploading new mime type', file.type);
       
       GoogleOAUTH.sendSignedRequest(
         'https://docs.google.com/feeds/default/private/full',
