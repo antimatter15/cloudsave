@@ -5,7 +5,7 @@ Hosts.webdav = function uploadWebDAV(req, callback){
   if(!localStorage.webdav_url){
     localStorage.webdav_url = prompt("Enter the URL of the WebDAV provider");
   }
-  if(!localStorage.webdav_url || !localStorage.webdav_url.test(/^http/)){
+  if(!localStorage.webdav_url || !/^http/.test(localStorage.webdav_url)){
     return callback("error: invalid webdav server url");
   }
 
