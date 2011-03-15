@@ -1,5 +1,6 @@
 // A raw WebDAV interface
 var WebDAV = {
+  auth: '',
   GET: function(url, callback) {
     return this.request('GET', url, {}, null, 'text', callback);
   },
@@ -48,6 +49,7 @@ var WebDAV = {
     for (var header in headers) {
       xhr.setRequestHeader(header, headers[header]);
     }
+    xhr.setRequestHeader("Authorization", WebDAV.auth);
     xhr.send(data);
 
     if(!callback) {

@@ -8,9 +8,13 @@ Hosts.webdav = function uploadWebDAV(req, callback){
   if(!localStorage.webdav_url || !/^http/.test(localStorage.webdav_url)){
     return callback("error: invalid webdav server url");
   }
+  if(!localStorage.webdav_auth){
+    localStorage.webdav_auth = "Basic "+btoa(prompt("WebDAV Username") + ":"+ prompt("WebDAV Password"));
+  }
+
 
   var fs = new WebDAV.Fs(localStorage.webdav_url);
-
+  WebDAV.auth = localStorage.webdav_auth; //this is a nasty hack
   getRaw(req, function(file){
     var body = new BlobBuilder();
     var bin = file.data, arr = new Uint8Array(bin.length);
