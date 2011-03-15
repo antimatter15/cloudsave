@@ -22,7 +22,12 @@ Hosts.webdav = function uploadWebDAV(req, callback){
       arr[i] = bin.charCodeAt(i);
     }
     body.append(arr.buffer);
-    fs.file(file.name).write(body.getBlob(), function(body){
+    fs.file(file.name).write(body.getBlob(), function(body, xhr){
+      if(xhr.status >= 200 && xhr.status < 300){
+        callback("Yay I think this means it works");
+      }else{
+        callback("error:"+xhr.status+" "+xhr.statusText);
+      }
       console.log(body);
     });
   });
