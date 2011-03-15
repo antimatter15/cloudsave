@@ -35,7 +35,8 @@ var classes = {
     gdocs: 'Google Docs',
     minus: 'Min.us',
     cloudapp: 'CloudApp',
-    droplr: 'Droplr'
+    droplr: 'Droplr',
+		webdav: 'WebDAV'
   }
 };
 
@@ -186,12 +187,17 @@ function updateMenus(){
     prop.parentId = save_as_more;
     menu_ids[chrome.contextMenus.create(clone(prop))] = others[i];
   }
-  /*
+  //*
+	menu_ids[chrome.contextMenus.create({
+		"type": "separator",
+		"contexts": ["all"],
+		"parentId": root_more
+	});
   menu_ids[chrome.contextMenus.create({
     "title": "Add/Remove",
     "contexts": ["all"],
-    "parentId": root
-  })] = 'add_remove';*/
+    "parentId": root_more
+  })] = 'add_remove'; //*/
 }
 
 updateMenus();
