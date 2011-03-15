@@ -36,7 +36,7 @@ var classes = {
     minus: 'Min.us',
     cloudapp: 'CloudApp',
     droplr: 'Droplr',
-		webdav: 'WebDAV'
+    webdav: 'WebDAV'
   }
 };
 
@@ -188,11 +188,11 @@ function updateMenus(){
     menu_ids[chrome.contextMenus.create(clone(prop))] = others[i];
   }
   //*
-	menu_ids[chrome.contextMenus.create({
-		"type": "separator",
-		"contexts": ["all"],
-		"parentId": root_more
-	});
+  menu_ids[chrome.contextMenus.create({
+    "type": "separator",
+    "contexts": ["all"],
+    "parentId": root_more
+  })] = 42;
   menu_ids[chrome.contextMenus.create({
     "title": "Add/Remove",
     "contexts": ["all"],
