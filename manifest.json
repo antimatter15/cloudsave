@@ -2,7 +2,7 @@
   "name": "Cloud Save",
   "version": "1.2.2",
   "description": "Save to cloud.",
-	"background_page": "cloudsave.html",
+  "background_page": "cloudsave.html",
   "permissions": [
     "*://*/",
     "tabs",
