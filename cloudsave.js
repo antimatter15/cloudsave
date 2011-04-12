@@ -37,6 +37,9 @@ var classes = {
     cloudapp: 'CloudApp',
     droplr: 'Droplr',
     webdav: 'WebDAV'
+  }, 
+  "link": {
+    dropdo: 'Dropdo' //this one is peculiar because it works differently from all the other hosts
   }
 };
 
@@ -90,19 +93,26 @@ function handle_click(info, tab){
                .replace(/[^\w]+/g,'_')
                .replace(/^_*|_*$/g,'');
   var host = menu_ids[info.menuItemId];
-  
-  if(host == 'dropbox' && localStorage.folder_prefix){
-    name = localStorage.folder_prefix + name;
-  }
-  if(info.parentMenuItemId == save_as){
-    //woot save as stuff
-    console.log('save as');
-    name = prompt('Save file as...', name);
-    if(!name) return;
-  };
-  
-  if(name.indexOf('/') != -1){
-    localStorage.folder_prefix = name.replace(/[^\/]+$/,'');
+  if(host == 'dropdo'){
+    chrome.tabs.create({
+      url: 'http://dropdo.com/upload?link='+url
+    })
+  }else{
+    if(host == 'dropbox' && localStorage.folder_prefix){
+      name = localStorage.folder_prefix + name;
+    }
+    if(info.parentMenuItemId == save_as){
+      //woot save as stuff
+      console.log('save as');
+      name = prompt('Save file as...', name);
+      if(!name) return;
+    };
+    
+    if(name.indexOf('/') != -1){
+      localStorage.folder_prefix = name.replace(/[^\/]+$/,'');
+    }
+    
+    upload(host, url, name);
   }
   console.log(host, url, name);
   recent.push(host);
@@ -110,7 +120,6 @@ function handle_click(info, tab){
   localStorage.cloudsave_recent = JSON.stringify(recent);
   updateMenus();
   
-  upload(host, url, name);
 }
 
 function updateMenus(){
@@ -139,10 +148,12 @@ function updateMenus(){
   for(var i = 0; i < sorted.length; i++){
     var prop = {
       "title": title_map[sorted[i]],
-      "onclick": handle_click,
-      "contexts": classes.image[sorted[i]] ? 
-                  ['image'] : ['page', 'link', 'image']
+      "onclick": handle_click
     };
+    prop.contexts = classes.image[sorted[i]] ? 
+                    ['image'] : 
+                  (classes.link[sorted[i]]? 
+                    ['image', 'link']:  ['page', 'link', 'image']);
     prop.parentId = root;
     menu_ids[chrome.contextMenus.create(clone(prop))] = sorted[i];
     prop.parentId = save_as;
@@ -178,10 +189,12 @@ function updateMenus(){
   for(var i = 0; i < others.length; i++){
     var prop = {
       "title": title_map[others[i]],
-      "onclick": handle_click,
-      "contexts": classes.image[others[i]] ? 
-                  ['image'] : ['page', 'link', 'image']
+      "onclick": handle_click
     };
+    prop.contexts = classes.image[others[i]] ? 
+                    ['image'] : 
+                  (classes.link[others[i]]? 
+                    ['image', 'link']:  ['page', 'link', 'image']);
     prop.parentId = root_more;
     menu_ids[chrome.contextMenus.create(clone(prop))] = others[i];
     prop.parentId = save_as_more;
