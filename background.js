@@ -31,17 +31,25 @@ function getURL(type, request, callback, sync){
       type: mime,
       id: request.id,
       size: data.length,
-      name: name
+      name: name, url: request.url
     });
     
     //callback(new dFile(data, name, mime, id, size)
   }else{
     
     var xhr = new XMLHttpRequest();
+    xhr.addEventListener('progress', function(evt){
+  		downloadProgress(request.url, evt);
+  	}, false)
+  
     xhr.open('GET', request.url, !sync);
     if(type == 'binary' || type == 'raw'){
       xhr.overrideMimeType('text/plain; charset=x-user-defined'); //should i loop through and do that & 0xff?
     }
+    if(type == 'arraybuffer'){
+			xhr.responseType == 'arraybuffer';
+		}
+    
     if(sync){
       xhr.send();
       return xhr.responseText;
@@ -66,7 +74,7 @@ function getURL(type, request, callback, sync){
         
           for(var raw = xhr.responseText, l = raw.length, i = 0, data = ''; i < l; i++) data += String.fromCharCode(raw.charCodeAt(i) & 0xff);
           
-          callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
+          callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name, url: request.url});
         }else{
         
           var bb = new BlobBuilder();//this webworker is totally overkill
@@ -84,7 +92,7 @@ function getURL(type, request, callback, sync){
           var worker = new Worker(url);
           worker.onmessage = function(e) {
             var data = e.data;
-            callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
+            callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name, url: request.url});
           };
           
           worker.postMessage(xhr.responseText);
@@ -93,9 +101,12 @@ function getURL(type, request, callback, sync){
         //*/
       }else if(type == 'raw'){
         var data = xhr.responseText;
-        callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name});
+        callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name, url: request.url});
+      }else if(type == 'arraybuffer'){
+      	var data = xhr.response;
+        callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name, url: request.url});
       }else{
-        callback({id: request.id, data: raw, type: request.type, size: data.length, name: request.name});
+        callback({id: request.id, data: raw, type: request.type, size: data.length, name: request.name, url: request.url});
       }
     }
     xhr.send();

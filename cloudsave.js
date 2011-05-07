@@ -2,7 +2,7 @@ var Hosts = {};
 
 var root = chrome.contextMenus.create({
   "title" : "Cloud Save",
-  "contexts" : ["page", "image", "link"]
+  "contexts" : ["page", "image", "link", "selection"]
 });
 
 var save_as = chrome.contextMenus.create({
@@ -86,12 +86,15 @@ try {
 
 function handle_click(info, tab){
   console.log(arguments);
-  var url = info.linkUrl || info.srcUrl || info.pageUrl;
+  var url = info.srcUrl || info.linkUrl || info.pageUrl;
   var name = unescape(unescape(unescape(url)))
               .replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,'') || 
             url.replace(/.*\/\/|www./g,'')
                .replace(/[^\w]+/g,'_')
                .replace(/^_*|_*$/g,'');
+  if(info.selectionText){
+  	url = 'data:text/plain,'+encodeURIComponent(info.selectionText);
+  }
   var host = menu_ids[info.menuItemId];
   if(host == 'dropdo'){
     chrome.tabs.create({
@@ -153,7 +156,7 @@ function updateMenus(){
     prop.contexts = classes.image[sorted[i]] ? 
                     ['image'] : 
                   (classes.link[sorted[i]]? 
-                    ['image', 'link']:  ['page', 'link', 'image']);
+                    ['image', 'link', 'selection']:  ['page', 'link', 'image', 'selection']);
     prop.parentId = root;
     menu_ids[chrome.contextMenus.create(clone(prop))] = sorted[i];
     prop.parentId = save_as;
@@ -215,30 +218,64 @@ function updateMenus(){
 
 updateMenus();
 
+function updateNotification(id, arg1, arg2){
+	var matches = chrome.extension.getViews({type:"notification"}).filter(function(win) {
+  	return win.location.search.substr(1) == id
+	});
+	if(matches.length){
+		if(arg2){
+			matches[0].document.getElementById('status').innerHTML = arg2;
+			matches[0].document.getElementById('icon').src = arg1;
+		}else{
+			matches[0].document.getElementById('status').innerHTML = arg1;
+		}
+	}else{
+		console.log('Error! Could not locate notification', id, arg1, arg2);
+	}
+}
+
+
+var urlid = {
+	//this is a sort of hack. it uses the file download urls
+	//as a sort of state callback whatnot stuff.
+};
+
+function uploadProgress(url, event){
+	updateNotification(urlid[url], 'icon/throbber.gif', event.loaded+'/'+event.total+' up');
+}
+
+function downloadProgress(url, event){
+	updateNotification(urlid[url], 'icon/throbber.gif', event.loaded+'/'+event.total + ' down');
+}
 
 
 function upload(host, url, name){
+	var id = Math.random().toString(36).substr(3);
+	var notification = webkitNotifications.createHTMLNotification('popup.html?'+id);
+	notification.ondisplay = function(){
+		setTimeout(function(){
+			updateNotification(id, 'icon/throbber.gif', 
+			"The file '"+name+"' is being downloaded... ");
+  	}, 100);
+	}
+	notification.show();
+	urlid[url] = id;
   Hosts[host]({
     url: url,
     name: name
   }, function(e){
     console.log('uploaded file yay', e);
     if(e && typeof e == "string" && e.indexOf('error:') != -1){
-      var notification = webkitNotifications.createNotification(
-        'icon/64sad.png',  // icon url - can be relative
-        "Aww Snap!",  // notification title
-        "The file '"+name+"' could not be uploaded to "+
-        title_map[host]+". "+e.substr(6)  // notification body text
-      );
-      notification.show();
+      updateNotification(id, 'icon/64sad.png', 
+      	"The file '"+name+"' could not be uploaded to "+
+        title_map[host]+". "+e.substr(6));
     }else{
-      var notification = webkitNotifications.createNotification(
-        'icon/64.png',  // icon url - can be relative
-        "Uploading Complete",  // notification title
-        "The file '"+name+"' has been uploaded to "+
-        title_map[host]+"."  // notification body text
-      );
-      notification.show();
+	    updateNotification(id, 'icon/64.png', 
+	    	"The file '"+name+"' has been uploaded to "+title_map[host]+"."
+	    );
+	    setTimeout(function(){
+	    	notification.cancel();
+			}, 4.2 * 1000)
     }
   })
 }

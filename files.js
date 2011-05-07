@@ -50,6 +50,9 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
   var rn = "\r\n";
   console.log(params)
   
+  var tmp = new XMLHttpRequest();
+  var abuf = 'responseType' in tmp && 'response' in tmp;
+  
   var binxhr = !!this.sendAsBinary;
   if(binxhr){
     var req = '', append = function(data){req += data}
@@ -61,6 +64,9 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
   
   var file_param = -1;
   var xhr = this;
+  
+  
+  
   
   for (var i in params) {
     if (typeof params[i] == "object") {
@@ -75,9 +81,13 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
   
   append(rn + "Content-Disposition: form-data; name=\"" + i + "\"");
   
-  getURL(binxhr?'binary':'raw',params[i], function(file){ //Uint8 does clamping, but sendAsBinary doesn't
+  getURL(abuf?'arraybuffer':(binxhr?'binary':'raw'),params[i], function(file){
+    //Uint8 does clamping, but sendAsBinary doesn't
     console.log('actual data entity', file);
     
+    xhr.upload.addEventListener('progress', function(evt){
+  		uploadProgress(file.url, evt);
+	  }, false)
 
     append("; filename=\""+file.name+"\"" + rn + "Content-type: "+file.type);
 
@@ -85,6 +95,8 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
 
     if(binxhr){
       append(file.data);
+    }else if(abuf){
+    	append(file.data);
     }else{
       var bin = file.data
       var arr = new Uint8Array(bin.length);
