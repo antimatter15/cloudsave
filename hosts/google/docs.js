@@ -39,11 +39,22 @@ Hosts.gdocs = function uploadGDocs(req, callback){
       if(file.name.indexOf('.docx') != -1) file.type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
       
       file.type = file.type.replace(/;.+/g,'');
+      var convert = false;
+      
+      var types = 'csv,tsv,tab,html,htm,doc,docx,ods,odt,rtf,sxw,txt,xls,xlsx,pdf,ppt,pps,wmf';
+      
+      var len = types.split(',').filter(function(x){
+      	return file.name.indexOf('.'+x) != -1
+      }).length;
+      
+      if(len > 0){
+      	convert = true;
+      }
       
       console.log('uploading new mime type', file.type);
       
       GoogleOAUTH.sendSignedRequest(
-        'https://docs.google.com/feeds/default/private/full',
+        'https://docs.google.com/feeds/default/private/full?convert='+convert,
         complete,
         {
           method: 'POST',

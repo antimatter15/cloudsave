@@ -218,14 +218,23 @@ function updateMenus(){
 
 updateMenus();
 
+//shamelessly stolen from john resig.
+function wbr(str, num) {  
+  return str.replace(RegExp("(\\w{" + num + "})(\\w)", "g"), function(all,text,char){ 
+    return text + "<wbr>" + char; 
+  }); 
+}
+
 function updateNotification(id, arg1, arg2){
 	var matches = chrome.extension.getViews({type:"notification"}).filter(function(win) {
   	return win.location.search.substr(1) == id
 	});
 	if(matches.length){
-		if(arg2){
+		if(typeof arg1 == 'number'){
+			matches[0].document.getElementById('progress').value = arg1;
+		}else if(arg2){
 			matches[0].document.getElementById('status').innerHTML = arg2;
-			matches[0].document.getElementById('icon').src = arg1;
+			matches[0].document.body.style.backgroundImage = 'url('+arg1+')';
 		}else{
 			matches[0].document.getElementById('status').innerHTML = arg1;
 		}
@@ -241,11 +250,11 @@ var urlid = {
 };
 
 function uploadProgress(url, event){
-	updateNotification(urlid[url], 'icon/throbber.gif', event.loaded+'/'+event.total+' up');
+	updateNotification(urlid[url], event.loaded/event.total/2 + 0.5);
 }
 
 function downloadProgress(url, event){
-	updateNotification(urlid[url], 'icon/throbber.gif', event.loaded+'/'+event.total + ' down');
+	updateNotification(urlid[url], event.loaded/event.total/2);
 }
 
 
@@ -255,7 +264,7 @@ function upload(host, url, name){
 	notification.ondisplay = function(){
 		setTimeout(function(){
 			updateNotification(id, 'icon/throbber.gif', 
-			"The file '"+name+"' is being downloaded... ");
+			"The file '"+wbr(name,8)+"' is being saved... <progress id='progress'></progress>");
   	}, 100);
 	}
 	notification.show();
@@ -267,11 +276,11 @@ function upload(host, url, name){
     console.log('uploaded file yay', e);
     if(e && typeof e == "string" && e.indexOf('error:') != -1){
       updateNotification(id, 'icon/64sad.png', 
-      	"The file '"+name+"' could not be uploaded to "+
+      	"The file '"+wbr(name,8)+"' could not be uploaded to "+
         title_map[host]+". "+e.substr(6));
     }else{
 	    updateNotification(id, 'icon/64.png', 
-	    	"The file '"+name+"' has been uploaded to "+title_map[host]+"."
+	    	"The file '"+wbr(name,8)+"' has been uploaded to "+title_map[host]+"."
 	    );
 	    setTimeout(function(){
 	    	notification.cancel();
