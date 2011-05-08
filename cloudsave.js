@@ -27,6 +27,7 @@ var classes = {
     posterous: 'Posterous',
     twitrpix: 'Twitrpix',
     twitgoo: 'Twitgoo',
+    facebook: 'Facebook',
     imgly: 'Imgly'
   },
   "all": {
