@@ -312,6 +312,9 @@ ChromeExOAuth.initCallbackPage = function() {
  */
 ChromeExOAuth.sendRequest = function(method, url, headers, body, callback) {
   var xhr = new XMLHttpRequest();
+  xhr.upload.addEventListener('progress', function(evt){
+		uploadProgress('todo_fix_this', evt);
+  }, false)
   xhr.onreadystatechange = function(data) {
     callback(xhr, data);
   }

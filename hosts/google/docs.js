@@ -1,13 +1,8 @@
 Hosts.gdocs = function uploadGDocs(req, callback){
 
-  getRaw(req, function(file){
+  getBuffer(req, function(file){
     var builder = new BlobBuilder();
-    var bin = file.data;
-    var arr = new Uint8Array(bin.length);
-    for(var i = 0, l = bin.length; i < l; i++){
-      arr[i] = bin.charCodeAt(i);
-    }
-    builder.append(arr.buffer);
+    builder.append(file.data);
     
   
   
@@ -52,9 +47,46 @@ Hosts.gdocs = function uploadGDocs(req, callback){
       }
       
       console.log('uploading new mime type', file.type);
+      var blob = builder.getBlob(file.type);
       
       GoogleOAUTH.sendSignedRequest(
-        'https://docs.google.com/feeds/default/private/full?convert='+convert,
+        'https://docs.google.com/feeds/upload/create-session/default/private/full',
+        function(body, xhr){
+        	var upload_uri = xhr.getResponseHeader('Location');
+        	
+        	var xhr = new XMLHttpRequest();
+        	xhr.open('PUT', upload_uri, true);
+        	xhr.setRequestHeader('Content-Type', file.type);
+        	 xhr.upload.addEventListener('progress', function(evt){
+						uploadProgress(file.url, evt);
+					}, false)
+					xhr.onload = function(){
+						console.log('OMFG DONE UPLAODING');
+						complete(xhr.responseText, xhr);
+					}
+					xhr.send(blob);
+        	
+        },
+        {
+          method: 'POST',
+          headers: {
+            'X-Upload-Content-Type': file.type,
+            'Content-Type': file.type,
+            'Slug': file.name,
+            'X-Upload-Content-Length': blob.size,
+            'GData-Version': '3.0'
+          },
+          parameters: {
+            alt: 'json',
+            convert: convert
+          },
+          body: ''
+        });
+        
+      
+      /*
+      GoogleOAUTH.sendSignedRequest(
+        'https://docs.google.com/feeds/default/private/full',
         complete,
         {
           method: 'POST',
@@ -64,11 +96,12 @@ Hosts.gdocs = function uploadGDocs(req, callback){
             'GData-Version': '3.0'
           },
           parameters: {
-            alt: 'json'
+            alt: 'json',
+            convert: false
           },
-          body: builder.getBlob(file.type)
+          body: blob
         });
-        
+        */
   
   }
   

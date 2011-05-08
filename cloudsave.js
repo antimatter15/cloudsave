@@ -31,6 +31,7 @@ var classes = {
   },
   "all": {
     box: 'Box.net',
+    sugarsync: 'SugarSync',
     dropbox: 'Dropbox',
     gdocs: 'Google Docs',
     minus: 'Min.us',
@@ -226,25 +227,41 @@ function wbr(str, num) {
 }
 
 function updateNotification(id, arg1, arg2){
-	var matches = chrome.extension.getViews({type:"notification"}).filter(function(win) {
-  	return win.location.search.substr(1) == id
-	});
-	if(matches.length){
-		if(typeof arg1 == 'number'){
-			matches[0].document.getElementById('progress').value = arg1;
-		}else if(arg2){
-			matches[0].document.getElementById('status').innerHTML = arg2;
-			matches[0].document.body.style.backgroundImage = 'url('+arg1+')';
+
+	function main(){
+		var wins = chrome.extension.getViews({type:"notification"})
+		var matches = wins.filter(function(win) {
+			return win.location.search.substr(1) == id
+		});
+		if(id == 42) matches = wins; //please coding gods dont kill me
+		if(matches.length){
+			if(typeof arg1 == 'number'){
+				if(!matches[0].document.getElementById('progress')) return false;
+				matches[0].document.getElementById('progress').value = arg1;
+			}else if(arg2){
+				matches[0].document.getElementById('status').innerHTML = arg2;
+				matches[0].document.body.style.backgroundImage = 'url('+arg1+')';
+			}else{
+				matches[0].document.getElementById('status').innerHTML = arg1;
+			}
 		}else{
-			matches[0].document.getElementById('status').innerHTML = arg1;
+			return false
 		}
-	}else{
+		return true
+	}
+	if(!main()){
 		console.log('Error! Could not locate notification', id, arg1, arg2);
+		var count = 0;
+		function looper(){
+			if(!main() && count++ < 100) setTimeout(looper, 10);
+		}
+		looper();
 	}
 }
 
 
 var urlid = {
+	'todo_fix_this': 42
 	//this is a sort of hack. it uses the file download urls
 	//as a sort of state callback whatnot stuff.
 };
@@ -262,10 +279,11 @@ function upload(host, url, name){
 	var id = Math.random().toString(36).substr(3);
 	var notification = webkitNotifications.createHTMLNotification('popup.html?'+id);
 	notification.ondisplay = function(){
-		setTimeout(function(){
-			updateNotification(id, 'icon/throbber.gif', 
+		updateNotification(id, 'icon/throbber.gif', 
 			"The file '"+wbr(name,8)+"' is being saved... <progress id='progress'></progress>");
-  	}, 100);
+	}
+	notification.onclose = function(){
+		delete urlid[url];
 	}
 	notification.show();
 	urlid[url] = id;

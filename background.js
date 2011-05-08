@@ -47,7 +47,8 @@ function getURL(type, request, callback, sync){
       xhr.overrideMimeType('text/plain; charset=x-user-defined'); //should i loop through and do that & 0xff?
     }
     if(type == 'arraybuffer'){
-			xhr.responseType == 'arraybuffer';
+    	console.log('Setting Type ArrayBuffer');
+			xhr.responseType = 'arraybuffer';
 		}
     
     if(sync){
@@ -58,15 +59,8 @@ function getURL(type, request, callback, sync){
       if(!request.type) request.type = xhr.getResponseHeader("Content-Type");
     
       console.log('opened via xhr ', request.url);
-      var raw = xhr.responseText, data = '';
-      //for(var l = raw.length, i=0; i<l;i++){ data += String.fromCharCode(raw.charCodeAt(i) & 0xff); if(!(i%(1024 * 1024))) console.log('1mb') };
-      //var data = postMessage(raw.split('').map(function(a){return String.fromCharCode(a.charCodeAt(0) & 0xff)}).join(''));
-      //window.fd = data;
-      
-      //var obj = {id: request.id, bin: function(){return raw}, b64: function(){return btoa(data)},type: request.type, size: data.length, name: request.name}
-      //callback(obj);
-      //because running it here since js is single threaded causes the asynchrouously running instantInit request to be delayed, slowing it down substantially.
-      //using a web worker: probably overkill.
+      var data = '';
+
 
       if(type == 'binary'){
         //*
@@ -106,6 +100,7 @@ function getURL(type, request, callback, sync){
       	var data = xhr.response;
         callback({id: request.id, data: data, type: request.type, size: data.length, name: request.name, url: request.url});
       }else{
+      	var raw = xhr.responseText;
         callback({id: request.id, data: raw, type: request.type, size: data.length, name: request.name, url: request.url});
       }
     }
@@ -127,3 +122,20 @@ function getBinary(request, callback){
 }
 
 
+function getBuffer(request, callback){
+	var tmp = new XMLHttpRequest();
+	var abuf = 'responseType' in tmp && 'response' in tmp;
+	getURL(abuf?'arraybuffer':'raw', request, function(file){
+		console.log(abuf, file);
+		if(abuf){
+			callback(file)
+		}else{
+			var bin = file.data
+		  var arr = new Uint8Array(bin.length);
+		  for(var i = 0, l = bin.length; i < l; i++)
+		    arr[i] = bin.charCodeAt(i);
+		  file.data = arr.buffer;
+		  callback(file);
+		}
+	})
+}

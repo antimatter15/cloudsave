@@ -20,14 +20,9 @@ Hosts.picasa = function uploadPicasa(req, callback){
     'picasa': 'Picasa Web Albums'
   };
   
-  getRaw(req, function(file){
+  getBuffer(req, function(file){
     var builder = new BlobBuilder();
-    var bin = file.data;
-    var arr = new Uint8Array(bin.length);
-    for(var i = 0, l = bin.length; i < l; i++){
-      arr[i] = bin.charCodeAt(i)
-    }
-    builder.append(arr.buffer);
+    builder.append(file.data);
     
   
   
