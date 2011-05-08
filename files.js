@@ -115,8 +115,8 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
     if(binxhr){
       xhr.sendAsBinary(req);
     }else{
-      superblob = req.getBlob();
-      xhr.send(req.getBlob());
+    	superblob = req.getBlob();
+      xhr.send(superblob);
     }
   });
 };
