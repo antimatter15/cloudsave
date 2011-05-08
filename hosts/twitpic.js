@@ -49,5 +49,6 @@ Hosts.twitpic = function uploadTwitpic(file, callback){
   }else{
     twitter_login(core_upload);
   }
+  return "http://twitpic.com/";
 }
 

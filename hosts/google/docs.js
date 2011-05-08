@@ -10,7 +10,9 @@ Hosts.gdocs = function uploadGDocs(req, callback){
     try{
       var prs = JSON.parse(resp);
       console.log(resp, xhr);
-      callback();
+      callback({
+      	url: 'https://docs.google.com/'
+      });
     }catch(err){
       if(resp.indexOf("ServiceForbiddenException") != -1){
         callback('error: Google Docs API only supports ppt, docx, doc, xlsx, xls, jpeg, html, png, rtf, csv, odf, odt, ods, and odt.');

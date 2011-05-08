@@ -192,7 +192,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 
 			if (!_isAccessGranted()) {
 				if (!_isAuthorized()) {
-					var message = _createOauthRequest("http://api.getdropbox.com/" + _dropboxApiVersion + "/oauth/request_token");
+					var message = _createOauthRequest("https://www.dropbox.com/" + _dropboxApiVersion + "/oauth/request_token");
 					
 					_sendOauthRequest(message, {
 						type: "text",
@@ -215,7 +215,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 					
 							_storeAuth(authTokens);
 							var init = this.initialize;
-							var url = "http://api.getdropbox.com/" + _dropboxApiVersion + "/oauth/authorize?oauth_token=" 
+							var url = "https://www.dropbox.com/" + _dropboxApiVersion + "/oauth/authorize?oauth_token=" 
 								+ authTokens["requestToken"] 
 								+ "&oauth_callback=" 
 								+ _authCallback;
@@ -259,7 +259,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 						}).bind(this)
 					});
 				} else {
-					var message = _createOauthRequest("https://api.getdropbox.com/" + _dropboxApiVersion + "/oauth/access_token", {
+					var message = _createOauthRequest("https://www.dropbox.com/" + _dropboxApiVersion + "/oauth/access_token", {
 						token: _tokens["requestToken"],
 						tokenSecret: _tokens["requestTokenSecret"]
 					});
@@ -302,7 +302,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		  return _isAccessGranted()
 		},
 		getAccountInfo: function(callback) {
-			var url = "https://api.dropbox.com/" + _dropboxApiVersion + "/account/info";
+			var url = "https://www.dropbox.com/" + _dropboxApiVersion + "/account/info";
 			var message = _createOauthRequest(url);
 			_sendOauthRequest(message, {
 				type: "json",
@@ -311,7 +311,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		},
 		
 		getDirectoryContents: function(path, callback) {
-			var url = "https://api.dropbox.com/" + _dropboxApiVersion + "/metadata/dropbox/" + path;
+			var url = "https://www.dropbox.com/" + _dropboxApiVersion + "/metadata/dropbox/" + path;
 			var message = _createOauthRequest(url, {
 				file_limit: _fileListLimit,
 				list: "true"
@@ -324,7 +324,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 		},
 		
 		getDirectoryMetadata: function(path, callback) {
-			var url = "https://api.dropbox.com/" + _dropboxApiVersion + "/metadata/dropbox/" + path;
+			var url = "https://www.dropbox.com/" + _dropboxApiVersion + "/metadata/dropbox/" + path;
 			var message = _createOauthRequest(url, {
 				list: "false"
 			});

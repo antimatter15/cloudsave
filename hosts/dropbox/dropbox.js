@@ -28,7 +28,9 @@ Hosts.dropbox = function uploadDropbox(req, callback){
             console.log('done uploading');
             //yay done. hopefully
               console.log('got stuffs now');
-              callback()
+              callback({
+              	url: 'https://www.dropbox.com/' 
+              })
           });
         })
           

@@ -282,8 +282,22 @@ function upload(host, url, name){
 		updateNotification(id, 'icon/throbber.gif', 
 			"The file '"+wbr(name,8)+"' is being saved... <progress id='progress'></progress>");
 	}
+	var has_uploaded = false;
+	var upload_callback = function(){};
+	
+	notification.onclick = function(){
+		if(has_uploaded){
+			openFile()
+		}else{
+			upload_callback = openFile;
+		}
+	}
 	notification.onclose = function(){
 		delete urlid[url];
+	}
+	
+	function openFile(){
+		chrome.tabs.create({url: has_uploaded})
 	}
 	notification.show();
 	urlid[url] = id;
@@ -291,6 +305,8 @@ function upload(host, url, name){
     url: url,
     name: name
   }, function(e){
+	  has_uploaded = e && e.url;
+	  setTimeout(upload_callback, 200);
     console.log('uploaded file yay', e);
     if(e && typeof e == "string" && e.indexOf('error:') != -1){
       updateNotification(id, 'icon/64sad.png', 
@@ -302,7 +318,7 @@ function upload(host, url, name){
 	    );
 	    setTimeout(function(){
 	    	notification.cancel();
-			}, 4.2 * 1000)
+			}, 5.4 * 1000) //May the fourth be with you.
     }
   })
 }

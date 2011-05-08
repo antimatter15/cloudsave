@@ -53,7 +53,9 @@ Hosts.sugarsync = function uploadsugarsync(req, callback){
 				uploadProgress(file.url, evt);
 			}, false)
 			xhr.onload = function(){
-				callback()
+				callback({
+					url: 'https://sugarsync.com/'
+				})
 			}
 			xhr.send(blob);
 		});

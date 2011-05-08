@@ -30,7 +30,7 @@ Hosts.picasa = function uploadPicasa(req, callback){
     var prs = JSON.parse(resp);
     console.log(resp, xhr);
     var href = prs.entry.link.filter(function(e){return e.type.indexOf('image/') == 0})[0].href
-    callback(href);
+    callback({url: href});
     
   }
   

@@ -86,4 +86,5 @@ Hosts.box = function uploadBox(file, callback){
   }
   
   create_folder()
+  return "http://box.net/";
 }

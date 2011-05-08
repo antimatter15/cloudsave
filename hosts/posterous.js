@@ -51,5 +51,6 @@ Hosts.posterous = function uploadposterous(file, callback){
   }else{
     twitter_login(core_upload);
   }
+  return "https://posterous.com/";
 }
 
