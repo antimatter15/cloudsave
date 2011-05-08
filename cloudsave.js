@@ -76,10 +76,11 @@ try {
 }catch(err){
   recent = [
     'gdocs',
-    'twitpic',
+    'facebook',
     'dropbox',
     'flickr',
     'box',
+    'clouddrive',
     'picasa',
     'gdocs',
     'dropbox'
