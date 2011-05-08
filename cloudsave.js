@@ -37,6 +37,7 @@ var classes = {
     gdocs: 'Google Docs',
     minus: 'Min.us',
     cloudapp: 'CloudApp',
+ 	  clouddrive: 'Cloud Drive',
     droplr: 'Droplr',
     webdav: 'WebDAV'
   }, 
