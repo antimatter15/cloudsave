@@ -25,7 +25,9 @@ Hosts.box = function uploadBox(file, callback){
     var xhr = new XMLHttpRequest();
     xhr.open('POST', 'https://upload.box.net/api/1.0/upload/'+localStorage.box_auth+'/'+folder+'?new_copy=1');
     xhr.onload = function(){
-      callback();
+      callback({
+        url: "http://box.net/"
+      });
     }
     xhr.sendMultipart({
       share: 1,
@@ -86,5 +88,4 @@ Hosts.box = function uploadBox(file, callback){
   }
   
   create_folder()
-  return "http://box.net/";
 }
