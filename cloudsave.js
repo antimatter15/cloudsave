@@ -91,11 +91,11 @@ try {
 function handle_click(info, tab){
   console.log(arguments);
   var url = info.srcUrl || info.linkUrl || info.pageUrl;
-  var name = unescape(unescape(unescape(url)))
+  var name = unescape(decodeURIComponent(unescape(unescape(unescape(url)))
               .replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,'') || 
             url.replace(/.*\/\/|www./g,'')
                .replace(/[^\w]+/g,'_')
-               .replace(/^_*|_*$/g,'');
+               .replace(/^_*|_*$/g,''))).replace(/\+/g, ' ');
   if(info.selectionText){
   	url = 'data:text/plain,'+encodeURIComponent(info.selectionText);
   }
@@ -229,8 +229,10 @@ function wbr(str, num) {
   }); 
 }
 
-function updateNotification(id, arg1, arg2){
+var INDETERMINATE = {};
 
+
+function updateNotification(id, arg1, arg2){
 	function main(){
 		var wins = chrome.extension.getViews({type:"notification"})
 		var matches = wins.filter(function(win) {
@@ -238,12 +240,13 @@ function updateNotification(id, arg1, arg2){
 		});
 		if(id == 42) matches = wins; //please coding gods dont kill me
 		if(matches.length){
-			if(typeof arg1 == 'number'){
-				if(!matches[0].document.getElementById('progress')) return false;
+			if(typeof arg1 == 'number' || arg1 == INDETERMINATE){
+				matches[0].document.getElementById('progress').style.display = '';
 				matches[0].document.getElementById('progress').value = arg1;
 			}else if(arg2){
 				matches[0].document.getElementById('status').innerHTML = arg2;
 				matches[0].document.body.style.backgroundImage = 'url('+arg1+')';
+				matches[0].document.getElementById('progress').style.display = 'none'
 			}else{
 				matches[0].document.getElementById('status').innerHTML = arg1;
 			}
@@ -283,7 +286,8 @@ function upload(host, url, name){
 	var notification = webkitNotifications.createHTMLNotification('popup.html?'+id);
 	notification.ondisplay = function(){
 		updateNotification(id, 'icon/throbber.gif', 
-			"The file '"+wbr(name,8)+"' is being saved... <progress id='progress'></progress>");
+			"The file '"+wbr(name,8)+"' is being saved to "+title_map[host]+"...");
+	  updateNotification(id, INDETERMINATE);
 	}
 	var has_uploaded = false;
 	var upload_callback = function(){};
@@ -292,6 +296,7 @@ function upload(host, url, name){
 		if(has_uploaded){
 			openFile()
 		}else{
+			updateNotification(id, "Opening file '"+wbr(name,8)+"' on "+title_map[host] +" in a few seconds...");
 			upload_callback = openFile;
 		}
 	}

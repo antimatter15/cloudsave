@@ -1,11 +1,19 @@
 Hosts.gdocs = function uploadGDocs(req, callback){
-
+	
+	var types = 'csv,tsv,tab,html,htm,doc,docx,ods,odt,rtf,sxw,txt,xls,xlsx,pdf,ppt,pps,wmf';
+  
   getBuffer(req, function(file){
     var builder = new BlobBuilder();
     builder.append(file.data);
     
   
-  
+  function handleErrors(resp){
+		if(resp.indexOf("ServiceForbiddenException") != -1){
+      callback('error: The Google Docs API will enable arbitrary file support shortly. Try again in a few days.');
+    }else{
+      callback('error:'+resp.replace(/<.*?>/g,' ').replace(/ +/g,' '));
+    }
+  }
   function complete(resp, xhr){
     try{
       var prs = JSON.parse(resp);
@@ -14,11 +22,7 @@ Hosts.gdocs = function uploadGDocs(req, callback){
       	url: 'https://docs.google.com/'
       });
     }catch(err){
-      if(resp.indexOf("ServiceForbiddenException") != -1){
-        callback('error: Google Docs API only supports ppt, docx, doc, xlsx, xls, jpeg, html, png, rtf, csv, odf, odt, ods, and odt.');
-      }else{
-        callback('error:'+resp.replace(/<.*?>/g,' ').replace(/ +/g,' '));
-      }
+      handleErrors(resp);
     }
   }
   
@@ -27,18 +31,37 @@ Hosts.gdocs = function uploadGDocs(req, callback){
   function uploadDocument(){
       console.log('uploading', file.type, file.name);
       
-      if(file.name.indexOf('.doc') != -1) file.type = 'application/msword';
-      if(file.name.indexOf('.xls') != -1) file.type = 'application/vnd.ms-excel';
-      if(file.name.indexOf('.ppt') != -1) file.type = 'application/vnd.ms-powerpoint';
+   
       
-
-      if(file.name.indexOf('.xlsx') != -1) file.type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-      if(file.name.indexOf('.docx') != -1) file.type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+			var types = {
+				"CSV": "text/csv",
+				"TSV": "text/tab-separated-values",
+				"TAB": "text/tab-separated-values",
+				"HTML": "text/html",
+				"HTM": "text/html",
+				"DOC": "application/msword",
+				"DOCX": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+				"ODS": "application/x-vnd.oasis.opendocument.spreadsheet",
+				"ODT": "application/vnd.oasis.opendocument.text",
+				"RTF": "application/rtf",
+				"SXW": "application/vnd.sun.xml.writer",
+				"TXT": "text/plain",
+				"XLS": "application/vnd.ms-excel",
+				"XLSX": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+				"PDF": "application/pdf",
+				"PPT": "application/vnd.ms-powerpoint",
+				"PPS": "application/vnd.ms-powerpoint",
+				"WMF": "image/x-wmf"
+			};
+			for(var i in types){
+				if((new RegExp("\\."+i+"$", 'i')).test(file.name)){
+					file.type = types[i];
+				}
+			}
+			
       
       file.type = file.type.replace(/;.+/g,'');
       var convert = false;
-      
-      var types = 'csv,tsv,tab,html,htm,doc,docx,ods,odt,rtf,sxw,txt,xls,xlsx,pdf,ppt,pps,wmf';
       
       var len = types.split(',').filter(function(x){
       	return file.name.indexOf('.'+x) != -1
@@ -55,19 +78,21 @@ Hosts.gdocs = function uploadGDocs(req, callback){
         'https://docs.google.com/feeds/upload/create-session/default/private/full',
         function(body, xhr){
         	var upload_uri = xhr.getResponseHeader('Location');
-        	
-        	var xhr = new XMLHttpRequest();
-        	xhr.open('PUT', upload_uri, true);
-        	xhr.setRequestHeader('Content-Type', file.type);
-        	 xhr.upload.addEventListener('progress', function(evt){
-						uploadProgress(file.url, evt);
-					}, false)
-					xhr.onload = function(){
-						console.log('OMFG DONE UPLAODING');
-						complete(xhr.responseText, xhr);
-					}
-					xhr.send(blob);
-        	
+        	if(upload_uri && xhr.status == 200){
+		      	
+		      	var xhr = new XMLHttpRequest();
+		      	xhr.open('PUT', upload_uri, true);
+		      	xhr.setRequestHeader('Content-Type', file.type);
+		      	 xhr.upload.addEventListener('progress', function(evt){
+							uploadProgress(file.url, evt);
+						}, false)
+						xhr.onload = function(){
+							complete(xhr.responseText, xhr);
+						}
+						xhr.send(blob);
+        	}else{
+	        	handleErrors(xhr.responseText)
+        	}
         },
         {
           method: 'POST',
@@ -84,6 +109,9 @@ Hosts.gdocs = function uploadGDocs(req, callback){
           },
           body: ''
         });
+        
+        
+        
         
       
       /*
