@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Cloud Save Settings</title>
+    <style>
+      body {
+        font-family: sans-serif, helvetica, arial;
+        margin-right: 50px;
+        margin-left: 120px;
+        background: url(icon/64.png) no-repeat;
+        background-position: 30px 30px;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h2 id="progress">Cloud Save Settings</h2>
+    <p>
+    	Please excuse the fact that this settings page is mostly empty.
+    </p>
+    <p>
+      <input type="checkbox" id="moar" onchange="toggle_additional(this.checked)"> <label for="moar">Enable Additional Hosts</label>
+    </p>
+		<p>
+		Local File Upload (Beta):
+		</p>
+    <p>
+    	<select id="hostselect"></select>
+    	<input type="file" onchange="upload(this.files)" multiple>
+    </p>
+    <script>
+    	function toggle_additional(state){
+    		localStorage.additional = state ? 'yes': '';
+	    	chrome.extension.getBackgroundPage().install_additional(state);
+    	}
+    	document.getElementById('moar').checked = localStorage.additional=='yes'
+    	
+    	var titles = chrome.extension.getBackgroundPage().title_map;
+    	for(var host in titles){
+    		var opt = document.createElement('option');
+    		opt.innerHTML = titles[host];
+    		opt.value = host;
+    		document.getElementById('hostselect').appendChild(opt);
+    	}
+    	
+    	function upload(files){
+    		for(var i = 0; i < files.length; i++){
+    			var url, file = files[i];
+    			if(window.createObjectURL){
+            url = window.createObjectURL(file)
+          }else if(window.createBlobURL){
+            url = window.createBlobURL(file)
+          }else if(window.URL && window.URL.createObjectURL){
+            url = window.URL.createObjectURL(file)
+          }else if(window.webkitURL && window.webkitURL.createObjectURL){
+            url = window.webkitURL.createObjectURL(file)
+          }
+				  chrome.extension.getBackgroundPage().upload(document.getElementById('hostselect').value, url, file.name);
+    		}
+    	}
+			
+    </script>    
+    <hr>
+    <div style="font-size: small">
+      Part of the <a href="https://github.com/antimatter15/cloudsave">Cloud Save project</a>. Written by <a href="http://twitter.com/antimatter15">@antimatter15</a> (please follow me on twitter). Email comments and concerns to antimatter15@gmail.com.
+    </div>
+
+  </body>
+</html>
