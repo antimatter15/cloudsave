@@ -1,7 +1,5 @@
 Hosts.gdocs = function uploadGDocs(req, callback){
 	
-	var types = 'csv,tsv,tab,html,htm,doc,docx,ods,odt,rtf,sxw,txt,xls,xlsx,pdf,ppt,pps,wmf';
-  
   getBuffer(req, function(file){
     var builder = new BlobBuilder();
     builder.append(file.data);
@@ -31,14 +29,11 @@ Hosts.gdocs = function uploadGDocs(req, callback){
   function uploadDocument(){
       console.log('uploading', file.type, file.name);
       
-   
       
 			var types = {
 				"CSV": "text/csv",
 				"TSV": "text/tab-separated-values",
 				"TAB": "text/tab-separated-values",
-				"HTML": "text/html",
-				"HTM": "text/html",
 				"DOC": "application/msword",
 				"DOCX": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 				"ODS": "application/x-vnd.oasis.opendocument.spreadsheet",
@@ -53,23 +48,17 @@ Hosts.gdocs = function uploadGDocs(req, callback){
 				"PPS": "application/vnd.ms-powerpoint",
 				"WMF": "image/x-wmf"
 			};
+			var matches = 0;
 			for(var i in types){
 				if((new RegExp("\\."+i+"$", 'i')).test(file.name)){
 					file.type = types[i];
+					matches++;
 				}
 			}
 			
-      
       file.type = file.type.replace(/;.+/g,'');
-      var convert = false;
+      var convert = matches > 0;
       
-      var len = types.split(',').filter(function(x){
-      	return file.name.indexOf('.'+x) != -1
-      }).length;
-      
-      if(len > 0){
-      	convert = true;
-      }
       
       console.log('uploading new mime type', file.type);
       var blob = builder.getBlob(file.type);

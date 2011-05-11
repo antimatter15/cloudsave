@@ -19,7 +19,7 @@ chrome.contextMenus.create({
 
 
 //todo: add more
-var classes = {
+var original = {
   "image": {
     picasa: 'Picasa',
     twitpic: 'TwitPic',
@@ -47,20 +47,34 @@ var classes = {
 };
 
 
+var additional = {
+	"image": {
+		imageshack: 'Imageshack',
+		imgur: 'Imgur',
+		immio: 'Imm.io'
+	},
+	"all": {
+		hotfile: 'Hotfile'
+	}
+};
+
+var classes = clone_r(original);
+
 function clone(obj){ //very shallow cloning
   var n = {};
   for(var i in obj) n[i] = obj[i]; //we are the knights who say ni!
   return n;
 }
-var title_map = {};
 
-for(var i in classes){
-  for(var h in classes[i]){
-    title_map[h] = classes[i][h]; //flatten it out
-  }
+function clone_r(obj){ //not so shallow cloning
+	if(typeof obj != 'object') return obj;
+  var n = {};
+  for(var i in obj) n[i] = clone(obj[i]); //we are the knights who say ni!
+  return n;
 }
 
-var menu_ids = {};
+
+
 
 //an order which shoudl theoretically work, but isnt optimal
 //in any stretch of the imagination
@@ -91,55 +105,75 @@ try {
 function handle_click(info, tab){
   console.log(arguments);
   var url = info.srcUrl || info.linkUrl || info.pageUrl;
-  var name = unescape(decodeURIComponent(unescape(unescape(unescape(url)))
-              .replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,'') || 
-            url.replace(/.*\/\/|www./g,'')
-               .replace(/[^\w]+/g,'_')
-               .replace(/^_*|_*$/g,''))).replace(/\+/g, ' ');
+  console.log('Source URL', url);
+  var name = unescape(decodeURIComponent(
+							unescape(unescape(unescape(url)))
+								.replace(/\s/g, '+')
+		            .replace(/^.*\/|\?.*$|\#.*$|\&.*$/g,'') || 
+		          url.replace(/.*\/\/|www./g,'')
+		             .replace(/[^\w]+/g,'_')
+		             .replace(/^_*|_*$/g,''))
+             ).replace(/\+/g, ' ');
+  console.log('Processed name', name);
   if(info.selectionText){
   	url = 'data:text/plain,'+encodeURIComponent(info.selectionText);
   }
   var host = menu_ids[info.menuItemId];
-  if(host == 'dropdo'){
-    chrome.tabs.create({
-      url: 'http://dropdo.com/upload?link='+url
-    })
+  if(Hosts[host]){
+		if(host == 'dropdo'){
+		  chrome.tabs.create({
+		    url: 'http://dropdo.com/upload?link='+url
+		  })
+		}else{
+		  if(host == 'dropbox' && localStorage.folder_prefix){
+		    name = localStorage.folder_prefix + name;
+		  }
+		  if(info.parentMenuItemId == save_as){
+		    //woot save as stuff
+		    console.log('save as');
+		    name = prompt('Save file as...', name);
+		    if(!name) return;
+		  };
+		  
+		  if(name.indexOf('/') != -1){
+		    localStorage.folder_prefix = name.replace(/[^\/]+$/,'');
+		  }
+		  
+		  upload(host, url, name);
+		}
+		console.log(host, url, name);
+		recent.push(host);
+		recent.shift();
+		localStorage.cloudsave_recent = JSON.stringify(recent);
+		updateMenus();
   }else{
-    if(host == 'dropbox' && localStorage.folder_prefix){
-      name = localStorage.folder_prefix + name;
-    }
-    if(info.parentMenuItemId == save_as){
-      //woot save as stuff
-      console.log('save as');
-      name = prompt('Save file as...', name);
-      if(!name) return;
-    };
-    
-    if(name.indexOf('/') != -1){
-      localStorage.folder_prefix = name.replace(/[^\/]+$/,'');
-    }
-    
-    upload(host, url, name);
+		alert("Could not find host "+host);
   }
-  console.log(host, url, name);
-  recent.push(host);
-  recent.shift();
-  localStorage.cloudsave_recent = JSON.stringify(recent);
-  updateMenus();
-  
 }
 
+var title_map = {};
+var menu_ids = {};
+
 function updateMenus(){
+	title_map = {};
+	for(var i in classes){
+		for(var h in classes[i]){
+		  title_map[h] = classes[i][h]; //flatten it out
+		}
+	}
+
   Object.keys(menu_ids).reverse().forEach(function(item){
     chrome.contextMenus.remove(parseInt(item));
   });
   menu_ids = {};
   for(var unique = [], freqmap = {}, i = 0; i < recent.length;i++){
-    if(!freqmap[recent[i]]){
-      freqmap[recent[i]] = 1;
-      unique.push(recent[i]);
+  	if(title_map[recent[i]]){
+		  if(!freqmap[recent[i]]){
+		    freqmap[recent[i]] = 1;
+		    unique.push(recent[i]);
+		  }
+		  freqmap[recent[i]]++;
     }
-    freqmap[recent[i]]++;
   }
   var dilation_factor = 100;
   function grade(result){
@@ -193,19 +227,40 @@ function updateMenus(){
     "contexts": ["all"]
   });
   menu_ids[root_more] = 'root_more';
-  for(var i = 0; i < others.length; i++){
-    var prop = {
-      "title": title_map[others[i]],
+  function add_more(host){
+		var prop = {
+      "title": title_map[host],
       "onclick": handle_click
     };
-    prop.contexts = classes.image[others[i]] ? 
+    prop.contexts = classes.image[host] ? 
                     ['image'] : 
-                  (classes.link[others[i]]? 
+                  (classes.link[host]? 
                     ['image', 'link']:  ['page', 'link', 'image']);
     prop.parentId = root_more;
-    menu_ids[chrome.contextMenus.create(clone(prop))] = others[i];
+    menu_ids[chrome.contextMenus.create(clone(prop))] = host;
     prop.parentId = save_as_more;
-    menu_ids[chrome.contextMenus.create(clone(prop))] = others[i];
+    menu_ids[chrome.contextMenus.create(clone(prop))] = host;
+  }
+  
+  for(var i = 0; i < others.length; i++){
+    if(classes.image[others[i]]){
+      add_more(others[i])
+    }
+  }
+  menu_ids[chrome.contextMenus.create({
+    "type": "separator",
+    "contexts": ["image"],
+    "parentId": root_more
+  })] = 42;
+  menu_ids[chrome.contextMenus.create({
+    "type": "separator",
+    "contexts": ["image"],
+    "parentId": save_as_more
+  })] = 42;
+  for(var i = 0; i < others.length; i++){
+    if(!classes.image[others[i]]){
+      add_more(others[i])
+    }
   }
   //*
   menu_ids[chrome.contextMenus.create({
@@ -216,11 +271,15 @@ function updateMenus(){
   menu_ids[chrome.contextMenus.create({
     "title": "Add/Remove",
     "contexts": ["all"],
-    "parentId": root_more
+    "parentId": root_more,
+    "onclick": open_settings
   })] = 'add_remove'; //*/
 }
 
-updateMenus();
+
+function open_settings(){
+	chrome.tabs.create({url: "settings.html"})
+}
 
 //shamelessly stolen from john resig.
 function wbr(str, num) {  
@@ -242,7 +301,7 @@ function updateNotification(id, arg1, arg2){
 		if(matches.length){
 			if(typeof arg1 == 'number' || arg1 == INDETERMINATE){
 				matches[0].document.getElementById('progress').style.display = '';
-				matches[0].document.getElementById('progress').value = arg1;
+				matches[0].document.getElementById('progress').value = arg1 == INDETERMINATE ? null : arg1;
 			}else if(arg2){
 				matches[0].document.getElementById('status').innerHTML = arg2;
 				matches[0].document.body.style.backgroundImage = 'url('+arg1+')';
@@ -331,3 +390,21 @@ function upload(host, url, name){
   })
 }
 
+
+function install_additional(state){
+	if(state){
+		for(var i in additional){
+			for(var ii in additional[i])
+				classes[i][ii] = additional[i][ii];
+		}
+	}else{
+		classes = clone_r(original);
+	}
+	updateMenus();
+}
+
+if(localStorage.additional == 'yes'){
+	install_additional(true);
+}else{
+	updateMenus();
+}
