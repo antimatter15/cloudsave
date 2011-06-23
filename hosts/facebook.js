@@ -38,39 +38,7 @@ Hosts.facebook = function uploadfacebook(file, callback){
 	function authorize(){
 		var url='https://graph.facebook.com/oauth/authorize?redirect_uri=http://drag2up.appspot.com/static/tpilb.html&client_id='+Keys.facebook.appid+'&scope=publish_stream';
 	
-		if(typeof chrome != 'undefined'){
-		  chrome.tabs.create({
-		    url: url
-		  }, function(tab){
-		    var poll = function(){
-		      chrome.tabs.get(tab.id, function(info){
-		        if(info.url.indexOf('code=') != -1){
-		          init(info.url);
-		          chrome.tabs.remove(tab.id);
-		        }else{
-		          setTimeout(poll, 100)
-		        }
-		      })
-		    };
-		    poll();
-		  })
-		}else if(typeof tabs != 'undefined'){
-		  tabs.open({
-		    url: url,
-		    onOpen: function(tab){
-		      var poll = function(){
-		        if(tab.url.indexOf('code=') != -1){
-		          init(tab.url);
-		          tab.close()
-		        }else{
-		          setTimeout(poll, 100)
-		        }
-		      };
-		      poll();
-		    }
-		  })
-		}
+		loginTab(url, 'code=', init);
   }
-  
   get_token();
 }

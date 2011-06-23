@@ -1,4 +1,37 @@
-
+function loginTab(loginurl, string, cb){
+	if(typeof chrome != 'undefined'){
+    chrome.tabs.create({
+      url: loginurl
+    }, function(tab){
+      var poll = function(){
+        chrome.tabs.get(tab.id, function(info){
+          if(info.url.indexOf(string) != -1){
+            cb(info.url);
+            chrome.tabs.remove(tab.id);
+          }else{
+            setTimeout(poll, 500)
+          }
+        })
+      };
+      poll();
+    })
+  }else if(typeof tabs != 'undefined'){
+    tabs.open({
+      url: loginurl,
+      onOpen: function(tab){
+        var poll = function(){
+          if(tab.url.indexOf(string) != -1){
+            cb(tab.url);
+            tab.close();
+          }else{
+            setTimeout(poll, 500)
+          }
+        };
+        poll();
+      }
+    })
+  }
+}
 
 function https(){
   if(localStorage.no_https == 'on'){
@@ -125,6 +158,7 @@ function getBinary(request, callback){
 function getBuffer(request, callback){
 	var tmp = new XMLHttpRequest();
 	var abuf = 'responseType' in tmp && 'response' in tmp;
+	console.log('Testing for array bufs', abuf);
 	getURL(abuf?'arraybuffer':'raw', request, function(file){
 		console.log(abuf, file);
 		if(abuf){

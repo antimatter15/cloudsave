@@ -78,42 +78,9 @@ function twitter_login(callback){
       }
       xhr.send()
 	  }
-	  if(typeof chrome != 'undefined'){
-      chrome.tabs.create({
-        url: url
-      }, function(tab){
-        var poll = function(){
-          chrome.tabs.get(tab.id, function(info){
-            if(info.url.indexOf('oauth_verifier') != -1){
-              init(info.url);
-              chrome.tabs.remove(tab.id);
-            }else{
-              setTimeout(poll, 100)
-            }
-          })
-        };
-        poll();
-      })
-    }else if(typeof tabs != 'undefined'){
-      tabs.open({
-        url: url,
-        onOpen: function(tab){
-          var poll = function(){
-            if(tab.url.indexOf('oauth_verifier') != -1){
-              init(tab.url);
-              tab.close()
-            }else{
-              setTimeout(poll, 100)
-            }
-          };
-          poll();
-        }
-      })
-    }
+	  
+	  loginTab(url, 'oauth_verifier', init);
 	
-	  /*
-
-	  */
   }
   xhr.send()
 }

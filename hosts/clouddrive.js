@@ -26,39 +26,8 @@ Hosts.clouddrive = function uploadclouddrive(file, callback){
 	
 	
 	function login(){
-		var loginurl = 'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fclouddrive%2F%3F_encoding%3DUTF8%26path%3D%252Fclouddrive%252F%26ref_%3Dpd_irl_gw_r%26signIn%3D1%26useRedirectOnSuccess%3D1%26action%3Dsign-out&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.pape.max_auth_age=0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select'
-    if(typeof chrome != 'undefined'){
-      chrome.tabs.create({
-        url: loginurl
-      }, function(tab){
-        var poll = function(){
-          chrome.tabs.get(tab.id, function(info){
-            if(info.url.indexOf('/clouddrive') != -1){
-              chrome.tabs.remove(tab.id);
-              getKeys();
-            }else{
-              setTimeout(poll, 100)
-            }
-          })
-        };
-        poll();
-      })
-    }else if(typeof tabs != 'undefined'){
-      tabs.open({
-        url: loginurl,
-        onOpen: function(tab){
-          var poll = function(){
-            if(tab.url.indexOf('/clouddrive') != -1){
-              tab.close();
-              getKeys();
-            }else{
-              setTimeout(poll, 100)
-            }
-          };
-          poll();
-        }
-      })
-    }
+		var loginurl = 'https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fclouddrive%2F%3F_encoding%3DUTF8%26path%3D%252Fclouddrive%252F%26ref_%3Dpd_irl_gw_r%26signIn%3D1%26useRedirectOnSuccess%3D1%26action%3Dsign-out&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.pape.max_auth_age=0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select';
+		loginTab(loginurl, '/clouddrive', getKeys);
 	}
 	
 	

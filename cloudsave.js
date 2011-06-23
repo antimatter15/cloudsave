@@ -39,6 +39,7 @@ var original = {
     cloudapp: 'CloudApp',
  	  clouddrive: 'Amazon Cloud',
     droplr: 'Droplr',
+    skydrive: 'SkyDrive',
     webdav: 'WebDAV'
   }, 
   "link": {

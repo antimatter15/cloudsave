@@ -53,39 +53,7 @@ Hosts.flickr = function uploadFlickr(req, uploaded_fn){
     }
     
    
-    
-    if(typeof chrome != 'undefined'){
-      chrome.tabs.create({
-        url: authurl
-      }, function(tab){
-        var poll = function(){
-          chrome.tabs.get(tab.id, function(info){
-            if(/frob=(.+)/.test(info.url)){
-              chrome.tabs.remove(tab.id);
-              init(info.url);
-            }else{
-              setTimeout(poll, 100)
-            }
-          })
-        };
-        poll();
-      })
-    }else if(typeof tabs != 'undefined'){
-      tabs.open({
-        url: authurl,
-        onOpen: function(tab){
-          var poll = function(){
-            if(/frob=(.+)/.test(tab.url)){
-              init(tab.url);
-              tab.close()
-            }else{
-              setTimeout(poll, 100)
-            }
-          };
-          poll();
-        }
-      })
-    }
+    loginTab(authurl, 'frob=', init);
   
   }
 

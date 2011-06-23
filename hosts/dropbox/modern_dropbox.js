@@ -220,42 +220,7 @@ var ModernDropbox = function(consumerKey, consumerSecret) {
 								+ "&oauth_callback=" 
 								+ _authCallback;
 
-		            
-		            if(typeof chrome != 'undefined'){
-                  chrome.tabs.create({
-				            url: url
-				          }, function(tab){
-				            var poll = function(){
-			                chrome.tabs.get(tab.id, function(info){
-				                if(info.url.indexOf('uid=') != -1){
-					                chrome.tabs.remove(tab.id);
-					                //dropbox.setup();
-					                init();
-
-				                }else{
-					                setTimeout(poll, 100)
-				                }
-			                })
-		                };
-		                poll();
-	                })
-		            }else if(typeof tabs != 'undefined'){
-		              tabs.open({
-		                url: url,
-		                onOpen: function(tab){
-                      var poll = function(){
-                      
-			                  if(tab.url.indexOf('uid=') != -1){
-				                  tab.close()
-				                  init();
-			                  }else{
-				                  setTimeout(poll, 100)
-			                  }
-		                  };
-		                  poll();
-		                }
-		              })
-		            }
+		          loginTab(url, 'uid=', init);
 						}).bind(this)
 					});
 				} else {

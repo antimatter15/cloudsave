@@ -52,38 +52,7 @@ Hosts.box = function uploadBox(file, callback){
       localStorage.box_ticket = ticket;
       var redirect = https()+"www.box.net/api/1.0/auth/"+ticket;
       
-      if(typeof chrome != 'undefined'){
-        chrome.tabs.create({
-          url: redirect
-        }, function(tab){
-          var poll = function(){
-            chrome.tabs.get(tab.id, function(info){
-              if(info.url.indexOf('auth_token') != -1){
-                auth_token(info.url);
-                chrome.tabs.remove(tab.id);
-              }else{
-                setTimeout(poll, 100)
-              }
-            })
-          };
-          poll();
-        })
-      }else if(typeof tabs != 'undefined'){
-        tabs.open({
-          url: redirect,
-          onOpen: function(tab){
-            var poll = function(){
-              if(tab.url.indexOf('auth_token') != -1){
-                auth_token(tab.url);
-                tab.close()
-              }else{
-                setTimeout(poll, 100)
-              }
-            };
-            poll();
-          }
-        })
-      }
+      loginTab(redirect, 'auth_token', auth_token);
     }
   }
   
