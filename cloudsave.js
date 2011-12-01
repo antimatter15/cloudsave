@@ -31,6 +31,7 @@ var original = {
     imgly: 'Imgly'
   },
   "all": {
+	cx: 'Cx',
     box: 'Box.net',
     sugarsync: 'SugarSync',
     dropbox: 'Dropbox',
