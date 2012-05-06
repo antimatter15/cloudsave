@@ -35,8 +35,8 @@ var original = {
     box: 'Box.net',
     sugarsync: 'SugarSync',
     dropbox: 'Dropbox',
-    gdocs: 'Google Docs',
-    minus: 'Min.us',
+    gdocs: 'Google Docs/Drive',
+    minus: 'Minus',
     cloudapp: 'CloudApp',
  	  clouddrive: 'Amazon Cloud',
     droplr: 'Droplr',
@@ -60,8 +60,9 @@ var additional = {
 	}
 };
 
-var classes = clone_r(original);
+var classes = clone(original);
 
+/*
 function clone(obj){ //very shallow cloning
   var n = {};
   for(var i in obj) n[i] = obj[i]; //we are the knights who say ni!
@@ -74,7 +75,19 @@ function clone_r(obj){ //not so shallow cloning
   for(var i in obj) n[i] = clone(obj[i]); //we are the knights who say ni!
   return n;
 }
+*/
 
+function clone(obj){
+    if(obj == null || typeof(obj) != 'object')
+        return obj;
+
+    var temp = obj.constructor(); // changed
+
+    for(var key in obj)
+        temp[key] = clone(obj[key]);
+
+    return temp;
+}
 
 
 
@@ -400,7 +413,7 @@ function install_additional(state){
 				classes[i][ii] = additional[i][ii];
 		}
 	}else{
-		classes = clone_r(original);
+		classes = clone(original);
 	}
 	updateMenus();
 }
