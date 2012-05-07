@@ -173,3 +173,17 @@ function getBuffer(request, callback){
 		}
 	})
 }
+
+var emptyFunc = function(){};
+
+function hashToQueryString(hash) {
+    var params = [];
+
+    for (key in hash) {
+        if (hash.hasOwnProperty(key)) {
+            params.push(key + "=" + hash[key]);
+        }
+    }
+
+    return params.join('&');
+}

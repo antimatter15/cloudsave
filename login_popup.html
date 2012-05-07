@@ -1,0 +1,27 @@
+<script>
+function usrpwd(){
+	var up = {};
+	up.usr = document.login_form.usr.value.trim();
+	up.pwd = document.login_form.pwd.value.trim();
+	up.keep = document.login_form.loginkeeping.checked;
+    chrome.tabs.getCurrent(function(tab){
+    	up.tid=tab.id;
+    	chrome.extension.sendRequest(up);
+    });
+//	window.close();
+}
+
+</script>
+
+<form name="login_form" action='' autocomplete="off" onsubmit="usrpwd();">
+	<label for="usr"> Username: </label>
+	<input id="usr" name="usr" required="required" type="text" placeholder="Username" autocomplete="off" /><br />
+	
+	<label for="pwd"> Password: </label>
+	<input id="pwd" name="pwd" required="required" type="password" placeholder="Password" autocomplete="off" /><br />
+	
+	<input type="checkbox" name="loginkeeping" id="loginkeeping" value="loginkeeping" checked="checked"/>Remember me<br />
+	
+	<input type="submit" value="Login" />
+	<input type="button" value="Cancel" onclick="window.close();" />
+</form>
