@@ -2,6 +2,7 @@
   do not venture below, i hate this.
   wont bother seeing if https works
 */
+/*
 var GoogleOAUTH = ChromeExOAuth.initBackgroundPage({
   'request_url' : 'https://www.google.com/accounts/OAuthGetRequestToken',
   'authorize_url' : 'https://www.google.com/accounts/OAuthAuthorizeToken',
@@ -11,7 +12,7 @@ var GoogleOAUTH = ChromeExOAuth.initBackgroundPage({
   'scope' : 'https://docs.google.com/feeds/ https://picasaweb.google.com/data/',
   'app_name' : 'cloudsave'
 });
-
+*/
 
 Hosts.picasa = function uploadPicasa(req, callback){
   // Constants for various album types.

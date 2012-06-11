@@ -12,6 +12,7 @@ Hosts.gdocs = function uploadGDocs(req, callback){
       callback('error:'+resp.replace(/<.*?>/g,' ').replace(/ +/g,' '));
     }
   }
+  
   function complete(resp, xhr){
     try{
       var prs = JSON.parse(resp);
@@ -23,7 +24,6 @@ Hosts.gdocs = function uploadGDocs(req, callback){
       handleErrors(resp);
     }
   }
-  
   
   
   function uploadDocument(){
