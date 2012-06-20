@@ -2,7 +2,7 @@ var Hosts = {};
 
 var root = chrome.contextMenus.create({
   "title" : "Cloud Save",
-  "contexts" : ["page", "image", "link", "selection"]
+  "contexts" : ["all"] //["page", "image", "link", "selection"]
 });
 
 var save_as = chrome.contextMenus.create({
@@ -32,7 +32,7 @@ var original = {
   },
   "all": {
 	cx: 'Cx',
-    box: 'Box.net',
+    box: 'Box.com',
     sugarsync: 'SugarSync',
     dropbox: 'Dropbox',
     gdocs: 'Google Docs/Drive',
@@ -209,7 +209,7 @@ function updateMenus(){
     prop.contexts = classes.image[sorted[i]] ? 
                     ['image'] : 
                   (classes.link[sorted[i]]? 
-                    ['image', 'link', 'selection']:  ['page', 'link', 'image', 'selection']);
+                    ['image', 'link', 'selection']: ['all'/*'page', 'link', 'image', 'selection'*/]);
     prop.parentId = root;
     menu_ids[chrome.contextMenus.create(clone(prop))] = sorted[i];
     prop.parentId = save_as;
@@ -250,7 +250,7 @@ function updateMenus(){
     prop.contexts = classes.image[host] ? 
                     ['image'] : 
                   (classes.link[host]? 
-                    ['image', 'link']:  ['page', 'link', 'image']);
+                    ['image', 'link']:  ['all'/*'page', 'link', 'image'*/]);
     prop.parentId = root_more;
     menu_ids[chrome.contextMenus.create(clone(prop))] = host;
     prop.parentId = save_as_more;

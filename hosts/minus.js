@@ -216,6 +216,7 @@ Hosts.minus = function uploadMinus(file, callback){
 
             onError: function(response) {
                 console.log('error: wrong refresh token: ', response);
+                minus_loginWindow();
             }
         });               
     }
