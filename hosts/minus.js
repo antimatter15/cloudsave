@@ -117,7 +117,7 @@ Hosts.minus = function uploadMinus(file, callback){
             	}
             	MINUS_API_TOKEN = response.access_token;
             	MINUS_API_USER = up.usr;
-            	minus_createGallery(up);
+            	minus_createGallery();
             },
 
             onError: function(response) {
@@ -126,15 +126,15 @@ Hosts.minus = function uploadMinus(file, callback){
         });
     }
 
-    minus_createGallery = function(up) {
+    minus_createGallery = function() {
         name = "Cloud Save";
 
         minus_callMethod('users/'+ MINUS_API_USER +"/folders", {
             method: "POST",
             params: {'name': name},
             onSuccess: function(gallery){
-            	if (up.keep)
-            	   localStorage.minus_gallery_id = gallery.id;
+//            	if (up.keep)
+//            	   localStorage.minus_gallery_id = gallery.id;
             	MINUS_GALLERY_ID=gallery.id;
             	minus_upload();
             	},
@@ -154,7 +154,8 @@ Hosts.minus = function uploadMinus(file, callback){
         xhr.onreadystatechange=function(){
         	if (xhr.readyState === 4){
         		if(xhr.status != 200){
-        			if (localStorage.minus_refresh_token && localStorage.minus_user && localStorage.minus_gallery_id){
+//        			if (localStorage.minus_refresh_token && localStorage.minus_user && localStorage.minus_gallery_id){
+	                if (localStorage.minus_refresh_token && localStorage.minus_user){
         				minus_refreshToken(localStorage.minus_refresh_token);
         			}
         			else{
@@ -208,12 +209,14 @@ Hosts.minus = function uploadMinus(file, callback){
             onSuccess: function(response) {
                 MINUS_API_TOKEN = response.access_token;
                 MINUS_API_USER = localStorage.minus_user;
-                MINUS_GALLERY_ID = localStorage.minus_gallery_id;
-                minus_upload();
+//                MINUS_GALLERY_ID = localStorage.minus_gallery_id;
+//                minus_upload();
+                minus_createGallery();
             },
 
             onError: function(response) {
                 console.log('error: wrong refresh token: ', response);
+                minus_loginWindow();
             }
         });               
     }
@@ -253,10 +256,12 @@ Hosts.minus = function uploadMinus(file, callback){
     	}
     );
 
-    if(MINUS_API_TOKEN && MINUS_API_USER && MINUS_GALLERY_ID){
+ //   if(MINUS_API_TOKEN && MINUS_API_USER && MINUS_GALLERY_ID){
+    if(MINUS_API_TOKEN && MINUS_API_USER){
 		minus_upload();
 	}
-	else if (localStorage.minus_refresh_token && localStorage.minus_user && localStorage.minus_gallery_id){
+//	else if (localStorage.minus_refresh_token && localStorage.minus_user && localStorage.minus_gallery_id){
+	else if (localStorage.minus_refresh_token && localStorage.minus_user){
 		minus_refreshToken(localStorage.minus_refresh_token);
 	}
 	else{

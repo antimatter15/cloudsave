@@ -40,6 +40,8 @@ function https(){
   return 'https://';
 }
 
+// 1. getURL: pull data from source URL to extension 
+// 2. sendMultipart: use the pulled data to build file locally in extension (via the append function inside sendMultipart), then send to hosts 
 function getURL(type, request, callback, sync){
   if(request.data && sync) return request.data;
   
