@@ -1,8 +1,11 @@
 {
+  "manifest_version": 2,
   "name": "Cloud Save",
   "version": "1.4",
   "description": "Save to cloud.",
-  "background_page": "cloudsave.html",
+  "background": {
+    "page": "background.html"
+  },
   "permissions": [
     "*://*/",
     "tabs",
