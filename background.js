@@ -1,3 +1,9 @@
+	window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+
+	Blob.prototype.slice = Blob.prototype.slice || function(start, length) {
+		return this.webkitSlice(start, start + length);
+	}
+
 function loginTab(loginurl, string, cb){
 	if(typeof chrome != 'undefined'){
     chrome.tabs.create({

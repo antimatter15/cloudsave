@@ -1,11 +1,3 @@
-<script>
-	window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
-
-	Blob.prototype.slice = Blob.prototype.slice || function(start, length) {
-		return this.webkitSlice(start, start + length);
-	}
-	
-</script>
 <script src="background.js"></script>
 <script src="cloudsave.js"></script>
 
