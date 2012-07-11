@@ -4,14 +4,6 @@
     	}
     	document.getElementById('moar').checked = localStorage.additional=='yes'
     	
-    	var titles = chrome.extension.getBackgroundPage().title_map;
-    	for(var host in titles){
-    		var opt = document.createElement('option');
-    		opt.innerHTML = titles[host];
-    		opt.value = host;
-    		document.getElementById('hostselect').appendChild(opt);
-    	}
-    	
     	function upload(files){
     		for(var i = 0; i < files.length; i++){
     			var url, file = files[i];
@@ -28,7 +20,15 @@
     		}
     	}
     
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function (){
+	  	var titles = chrome.extension.getBackgroundPage().title_map;
+    	for(var host in titles){
+    		var opt = document.createElement('option');
+    		opt.innerHTML = titles[host];
+    		opt.value = host;
+    		document.getElementById('hostselect').appendChild(opt);
+    	}
+	
 	document.querySelector("#moar").addEventListener('change', function(){toggle_additional(this.checked)});
 	document.querySelector("#file").addEventListener('change', function(){upload(this.files)});
 });
