@@ -64,7 +64,7 @@ Hosts.flickr = function uploadFlickr(req, uploaded_fn){
     var p = auth({
       auth_token: localStorage.flickr_token, 
       tags: "drag2up",
-      is_public: 1
+      is_public: 0
     });
     p.photo = req;
     xhr.onload = function(){
