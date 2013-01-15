@@ -43,9 +43,10 @@ Hosts.sugarsync = function uploadsugarsync(req, callback){
 	
 	function upload(ref){
 		getBuffer(req, function(file){
-			var builder = new BlobBuilder();
-			builder.append(file.data);
-			var blob = builder.getBlob();
+			//var builder = new BlobBuilder();
+			//builder.append(file.data);
+			//var blob = builder.getBlob();
+			var blob = new Blob([file.data]);
 			var xhr = new XMLHttpRequest();
 			xhr.open('PUT', ref+'/data', true);
 			xhr.setRequestHeader('Authorization', localStorage.sugarsync_auth);

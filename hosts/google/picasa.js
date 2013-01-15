@@ -22,10 +22,9 @@ Hosts.picasa = function uploadPicasa(req, callback){
   };
   
   getBuffer(req, function(file){
-    var builder = new BlobBuilder();
-    builder.append(file.data);
-    
-  
+    //var builder = new BlobBuilder();
+    //builder.append(file.data);
+    var blob = new Blob([file.data], {type: file.type});
   
   function complete(resp, xhr){
     var prs = JSON.parse(resp);
@@ -79,7 +78,8 @@ xmlns:media='http://search.yahoo.com/mrss/'\
           parameters: {
             alt: 'json'
           },
-          body: builder.getBlob(file.type)
+          //body: builder.getBlob(file.type)
+          body: blob
         });
         
   

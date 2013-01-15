@@ -57,7 +57,7 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
   if(binxhr){
     var req = '', append = function(data){req += data}
   }else{
-    var req = new BlobBuilder(), append = function(data){req.append(data)}
+    var req = [], append = function(data){req.push(data)}
   }
   
   append("--" + BOUNDARY);
@@ -115,7 +115,7 @@ XMLHttpRequest.prototype.sendMultipart = function(params) {
     if(binxhr){
       xhr.sendAsBinary(req);
     }else{
-    	superblob = req.getBlob();
+    	superblob = new Blob(req);
       xhr.send(superblob);
     }
   });
