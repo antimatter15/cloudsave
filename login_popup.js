@@ -11,5 +11,5 @@ function usrpwd(){
 
 document.addEventListener('DOMContentLoaded', function () {
 	document.login_form.addEventListener('submit',usrpwd);
-	document.login_form.cancel.addEventListener('click',window.close);
+	document.login_form.cancel.addEventListener('click',function(){window.close.call(window)});
 });

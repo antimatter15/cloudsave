@@ -16,13 +16,14 @@ Hosts.webdav = function uploadWebDAV(req, callback){
   var fs = new WebDAV.Fs(localStorage.webdav_url);
   WebDAV.auth = localStorage.webdav_auth; //this is a nasty hack
   getRaw(req, function(file){
-    var body = new BlobBuilder();
+    //var body = new BlobBuilder();
     var bin = file.data, arr = new Uint8Array(bin.length);
     for(var i = 0; i < bin.length; i++){
       arr[i] = bin.charCodeAt(i);
     }
-    body.append(arr.buffer);
-    fs.file("/"+file.name).write(body.getBlob(), function(body, xhr){
+    //body.append(arr.buffer);
+    var body = new Blob([arr.buffer]);
+    fs.file("/"+file.name).write(body, function(body, xhr){
       if(xhr.status >= 200 && xhr.status < 300){
         callback("Yay I think this means it works");
       }else{

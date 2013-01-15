@@ -1,9 +1,8 @@
 Hosts.gdocs = function uploadGDocs(req, callback){
 	
   getBuffer(req, function(file){
-    var builder = new BlobBuilder();
-    builder.append(file.data);
-    
+//    var builder = new BlobBuilder();
+//    builder.append(file.data);
   
   function handleErrors(resp){
 		if(resp.indexOf("ServiceForbiddenException") != -1){
@@ -61,7 +60,8 @@ Hosts.gdocs = function uploadGDocs(req, callback){
       
       
       console.log('uploading new mime type', file.type);
-      var blob = builder.getBlob(file.type);
+      //var blob = builder.getBlob(file.type);
+      var blob = new Blob([file.data], {type: file.type});
       
       GoogleOAUTH.sendSignedRequest(
         'https://docs.google.com/feeds/upload/create-session/default/private/full',
