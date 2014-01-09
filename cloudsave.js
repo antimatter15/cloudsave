@@ -306,37 +306,12 @@ function wbr(str, num) {
 var INDETERMINATE = {};
 
 
-function updateNotification(id, arg1, arg2){
-	function main(){
-		var wins = chrome.extension.getViews({type:"notification"})
-		var matches = wins.filter(function(win) {
-			return win.location.search.substr(1) == id
-		});
-		if(id == 42) matches = wins; //please coding gods dont kill me
-		if(matches.length){
-			if(typeof arg1 == 'number' || arg1 == INDETERMINATE){
-				matches[0].document.getElementById('progress').style.display = '';
-				matches[0].document.getElementById('progress').value = arg1 == INDETERMINATE ? null : arg1;
-			}else if(arg2){
-				matches[0].document.getElementById('status').innerHTML = arg2;
-				matches[0].document.body.style.backgroundImage = 'url('+arg1+')';
-				matches[0].document.getElementById('progress').style.display = 'none'
-			}else{
-				matches[0].document.getElementById('status').innerHTML = arg1;
-			}
-		}else{
-			return false
+function updateNotification(id,opt){
+	chrome.notifications.update(id, opt,function(wasUpdated){
+		if(!wasUpdated){
+			console.log('Error! Could not locate notification', id,opt.title, opt.message);
 		}
-		return true
-	}
-	if(!main()){
-		console.log('Error! Could not locate notification', id, arg1, arg2);
-		var count = 0;
-		function looper(){
-			if(!main() && count++ < 100) setTimeout(looper, 10);
-		}
-		looper();
-	}
+	});
 }
 
 
@@ -346,62 +321,96 @@ var urlid = {
 	//as a sort of state callback whatnot stuff.
 };
 
-function uploadProgress(url, event){
-	updateNotification(urlid[url], event.loaded/event.total/2 + 0.5);
+function uploadProgress(url, evt){
+	var pr=Math.round(evt.loaded * 100 / evt.total);
+	var upload={
+		type: 'progress',
+		title:'Upload',
+		message:'Uploading...',
+		iconUrl:'icon/48.png',
+		progress:pr
+	}
+	updateNotification(urlid[url],upload);
 }
 
-function downloadProgress(url, event){
-	updateNotification(urlid[url], event.loaded/event.total/2);
+function downloadProgress(url, evt){
+	var pr=Math.round(evt.loaded * 100 / evt.total);
+	var download={
+		type: 'progress',
+		title:'Download',
+		message:'Downloading...',
+		iconUrl:'icon/48.png',
+		progress:pr
+	}
+	updateNotification(urlid[url],download);
 }
 
 
 function upload(host, url, name){
 	var id = Math.random().toString(36).substr(3);
-	var notification = webkitNotifications.createHTMLNotification('popup.html?'+id);
-	notification.ondisplay = function(){
-		updateNotification(id, 'icon/throbber.gif', 
-			"The file '"+wbr(name,8)+"' is being saved to "+title_map[host]+"...");
-	  updateNotification(id, INDETERMINATE);
+	var opt = {
+	  type: "basic",
+	  title: "Saving",
+	  message: 'The file is being saved to '+title_map[host],
+	  iconUrl: "icon/throbber.gif"
 	}
+	chrome.notifications.create(id, opt,function(nid){
+		console.log("id="+nid);
+	})
+
 	var has_uploaded = false;
 	var upload_callback = function(){};
 	
-	notification.onclick = function(){
+	chrome.notifications.onClicked.addListener(function(notificationId){
 		if(has_uploaded){
-			openFile()
+			openFile();
+			clearnotification(notificationId);
 		}else{
-			updateNotification(id, "Opening file '"+wbr(name,8)+"' on "+title_map[host] +" in a few seconds...");
 			upload_callback = openFile;
 		}
-	}
-	notification.onclose = function(){
+	})
+	
+	chrome.notifications.onClosed.addListener(function(notificationId,byUser){
 		delete urlid[url];
+	})
+	
+	function clearnotification(id){
+		chrome.notifications.clear(id, function(wasCleared){
+			if(wasCleared!=true)
+				console.log('clear notification failed');
+		})
 	}
 	
 	function openFile(){
 		chrome.tabs.create({url: has_uploaded})
 	}
-	notification.show();
 	urlid[url] = id;
   Hosts[host]({
     url: url,
     name: name
   }, function(e){
 	  has_uploaded = e && e.url;
+	  var ntitle,nmsg,nicon;
 	  setTimeout(upload_callback, 200);
     console.log('uploaded file yay', e);
     if(e && typeof e == "string" && e.indexOf('error:') != -1){
-      updateNotification(id, 'icon/64sad.png', 
-      	"The file '"+wbr(name,8)+"' could not be uploaded to "+
-        title_map[host]+". "+e.substr(6));
+		ntitle='Error';
+		nmsg="Could not be uploaded to "+title_map[host];
+		console.log('e.error'+e.substr(6));
+		nicon='icon/64sad.png';
     }else{
-	    updateNotification(id, 'icon/64.png', 
-	    	"The file '"+wbr(name,8)+"' has been uploaded to "+title_map[host]+"."
-	    );
-	    setTimeout(function(){
-	    	notification.cancel();
-			}, 5.4 * 1000) //May the fourth be with you.
+		ntitle="Success";
+		nmsg="The file has been uploaded to "+title_map[host]+", click me to view.";
+		nicon="icon/64.png";
     }
+	
+		var opt = {
+			  type: 'basic',
+			  title: ntitle,
+			  message: nmsg,
+			  iconUrl: nicon
+			};
+		updateNotification(id, opt);
   })
 }
 
