@@ -90,7 +90,9 @@ Hosts.flickr = function uploadFlickr(req, uploaded_fn){
               method: 'flickr.photos.getSizes',
               photo_id: pid,
               nojsoncallback: 1,
-              format: 'json'
+              format: 'json',
+			  auth_token: localStorage.flickr_token
+
             })))
             xt.onload = function(){
               var json = JSON.parse(xt.responseText);
